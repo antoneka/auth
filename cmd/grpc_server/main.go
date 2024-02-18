@@ -23,6 +23,9 @@ func (s *server) Create(
 	ctx context.Context,
 	req *desc.CreateRequest,
 ) (*desc.CreateResponse, error) {
+	_, cancel := context.WithCancel(ctx)
+	defer cancel()
+
 	fmt.Printf("%+v\n", req)
 
 	return &desc.CreateResponse{}, nil
@@ -32,6 +35,9 @@ func (s *server) Get(
 	ctx context.Context,
 	req *desc.GetRequest,
 ) (*desc.GetResponse, error) {
+	_, cancel := context.WithCancel(ctx)
+	defer cancel()
+
 	fmt.Printf("+%v\n", req)
 
 	return &desc.GetResponse{}, nil
@@ -41,6 +47,9 @@ func (s *server) Update(
 	ctx context.Context,
 	req *desc.UpdateRequest,
 ) (*emptypb.Empty, error) {
+	_, cancel := context.WithCancel(ctx)
+	defer cancel()
+
 	fmt.Printf("+%v\n", req)
 
 	return &emptypb.Empty{}, nil
@@ -50,6 +59,9 @@ func (s *server) Delete(
 	ctx context.Context,
 	req *desc.DeleteRequest,
 ) (*emptypb.Empty, error) {
+	_, cancel := context.WithCancel(ctx)
+	defer cancel()
+
 	fmt.Printf("%+v\n", req)
 
 	return &emptypb.Empty{}, nil
