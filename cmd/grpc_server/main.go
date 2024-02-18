@@ -19,6 +19,7 @@ type server struct {
 	desc.UnimplementedUserV1Server
 }
 
+// Create creates a new user.
 func (s *server) Create(
 	ctx context.Context,
 	req *desc.CreateRequest,
@@ -31,6 +32,7 @@ func (s *server) Create(
 	return &desc.CreateResponse{}, nil
 }
 
+// Get gets information about the user.
 func (s *server) Get(
 	ctx context.Context,
 	req *desc.GetRequest,
@@ -43,6 +45,7 @@ func (s *server) Get(
 	return &desc.GetResponse{}, nil
 }
 
+// Update updates user information.
 func (s *server) Update(
 	ctx context.Context,
 	req *desc.UpdateRequest,
@@ -55,6 +58,7 @@ func (s *server) Update(
 	return &emptypb.Empty{}, nil
 }
 
+// Delete deletes the user from the system.
 func (s *server) Delete(
 	ctx context.Context,
 	req *desc.DeleteRequest,

@@ -8,10 +8,15 @@ import "google/protobuf/empty.proto";
 
 option go_package = "github.com/antoneka/auth/pkg/user_v1;user_v1";
 
+// UserV1 is a service for user authentication.
 service UserV1 {
+  // Create creates a new user.
   rpc Create(CreateRequest) returns (CreateResponse);
+  // Get gets information about the user.
   rpc Get(GetRequest) returns (GetResponse);
+  // Update updates user information.
   rpc Update(UpdateRequest) returns (google.protobuf.Empty);
+  // Delete deletes the user from the system.
   rpc Delete(DeleteRequest) returns (google.protobuf.Empty);
 }
 
@@ -21,37 +26,37 @@ enum Role {
 }
 
 message CreateRequest {
-  string name = 1;
-  string email = 2;
-  string password = 3;
-  string password_confirm = 4;
-  Role role = 5;
+  string name = 1; // Name of the user to create.
+  string email = 2; // Email of the user to create.
+  string password = 3; // Password of the user to create.
+  string password_confirm = 4; // Password confirmation of the user to create.
+  Role role = 5; // Indicates the user`s role.
 }
 
 message CreateResponse {
-  int64 id = 1;
+  int64 id = 1; // User ID of the created user.
 }
 
 message GetRequest {
-  int64 id = 1;
+  int64 id = 1; // The ID of the user to get the information for.
 }
 
 message GetResponse {
-  int64 id = 1;
-  string name = 2;
-  string email = 3;
-  Role role = 4;
-  google.protobuf.Timestamp created_at = 5;
-  google.protobuf.Timestamp updated_at = 6;
+  int64 id = 1; // User ID.
+  string name = 2; // Name of the user.
+  string email = 3; // Email of the user.
+  Role role = 4; // Role of the user.
+  google.protobuf.Timestamp created_at = 5; // Time when the user was created.
+  google.protobuf.Timestamp updated_at = 6; // Time when the user was last updated.
 }
 
 message UpdateRequest {
-  int64 id = 1;
-  google.protobuf.StringValue name = 2;
-  google.protobuf.StringValue email = 3;
-  Role role = 4;
+  int64 id = 1; // The ID of the user to update the information for.
+  google.protobuf.StringValue name = 2; // New name of the user.
+  google.protobuf.StringValue email = 3; // New email of the user.
+  Role role = 4; // New role of the user.
 }
 
 message DeleteRequest {
-  int64 id = 1;
+  int64 id = 1; // The ID of the user to be deleted from the system.
 }

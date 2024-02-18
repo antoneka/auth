@@ -74,11 +74,11 @@ type CreateRequest struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Name            string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	Email           string `protobuf:"bytes,2,opt,name=email,proto3" json:"email,omitempty"`
-	Password        string `protobuf:"bytes,3,opt,name=password,proto3" json:"password,omitempty"`
-	PasswordConfirm string `protobuf:"bytes,4,opt,name=password_confirm,json=passwordConfirm,proto3" json:"password_confirm,omitempty"`
-	Role            Role   `protobuf:"varint,5,opt,name=role,proto3,enum=user_v1.Role" json:"role,omitempty"`
+	Name            string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`                                              // Name of the user to create.
+	Email           string `protobuf:"bytes,2,opt,name=email,proto3" json:"email,omitempty"`                                            // Email of the user to create.
+	Password        string `protobuf:"bytes,3,opt,name=password,proto3" json:"password,omitempty"`                                      // Password of the user to create.
+	PasswordConfirm string `protobuf:"bytes,4,opt,name=password_confirm,json=passwordConfirm,proto3" json:"password_confirm,omitempty"` // Password confirmation of the user to create.
+	Role            Role   `protobuf:"varint,5,opt,name=role,proto3,enum=user_v1.Role" json:"role,omitempty"`                           // Indicates the user`s role.
 }
 
 func (x *CreateRequest) Reset() {
@@ -153,7 +153,7 @@ type CreateResponse struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Id int64 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Id int64 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"` // User ID of the created user.
 }
 
 func (x *CreateResponse) Reset() {
@@ -200,7 +200,7 @@ type GetRequest struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Id int64 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Id int64 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"` // The ID of the user to get the information for.
 }
 
 func (x *GetRequest) Reset() {
@@ -247,12 +247,12 @@ type GetResponse struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Id        int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	Name      string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Email     string                 `protobuf:"bytes,3,opt,name=email,proto3" json:"email,omitempty"`
-	Role      Role                   `protobuf:"varint,4,opt,name=role,proto3,enum=user_v1.Role" json:"role,omitempty"`
-	CreatedAt *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	UpdatedAt *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	Id        int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                               // User ID.
+	Name      string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`                            // Name of the user.
+	Email     string                 `protobuf:"bytes,3,opt,name=email,proto3" json:"email,omitempty"`                          // Email of the user.
+	Role      Role                   `protobuf:"varint,4,opt,name=role,proto3,enum=user_v1.Role" json:"role,omitempty"`         // Role of the user.
+	CreatedAt *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"` // Time when the user was created.
+	UpdatedAt *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"` // Time when the user was last updated.
 }
 
 func (x *GetResponse) Reset() {
@@ -334,10 +334,10 @@ type UpdateRequest struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Id    int64                   `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	Name  *wrapperspb.StringValue `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Email *wrapperspb.StringValue `protobuf:"bytes,3,opt,name=email,proto3" json:"email,omitempty"`
-	Role  Role                    `protobuf:"varint,4,opt,name=role,proto3,enum=user_v1.Role" json:"role,omitempty"`
+	Id    int64                   `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                       // The ID of the user to update the information for.
+	Name  *wrapperspb.StringValue `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`                    // New name of the user.
+	Email *wrapperspb.StringValue `protobuf:"bytes,3,opt,name=email,proto3" json:"email,omitempty"`                  // New email of the user.
+	Role  Role                    `protobuf:"varint,4,opt,name=role,proto3,enum=user_v1.Role" json:"role,omitempty"` // New role of the user.
 }
 
 func (x *UpdateRequest) Reset() {
@@ -405,7 +405,7 @@ type DeleteRequest struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Id int64 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Id int64 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"` // The ID of the user to be deleted from the system.
 }
 
 func (x *DeleteRequest) Reset() {
