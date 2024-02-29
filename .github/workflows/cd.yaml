@@ -1,0 +1,67 @@
+name: CD
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  images-build-and-push:
+    runs-on: ubuntu-22.04
+
+    env:
+      PG_DATABASE_NAME: ${{ secrets.PG_DATABASE_NAME }}
+      PG_USER: ${{ secrets.PG_USER }}
+      PG_PASSWORD: ${{ secrets.PG_PASSWORD }}
+      PG_PORT: ${{ secrets.PG_PORT }}
+      REGISTRY: "cr.selcloud.ru/antoneka"
+      SERVER_IMAGE_NAME: "auth-server"
+      SERVER_CONTAINER_NAME: "auth-server-container"
+      MIGRATOR_IMAGE_NAME: "migrator"
+      MIGRATION_DIR: "./migrations"
+
+    steps:
+      - name: Checkout master
+        uses: actions/checkout@v4
+
+      - name: Login to Docker Registry
+        run: docker login -u ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.REGISTRY_PASSWORD }} $REGISTRY
+
+      - name: Build docker-compose images
+        run: |
+          TAG_NAME=$(echo $GITHUB_SHA | head -c7)
+          docker buildx create --use
+          docker buildx build --no-cache --push --tag $REGISTRY/$SERVER_IMAGE_NAME:$TAG_NAME -f Dockerfile .
+          docker buildx build --no-cache --push --tag $REGISTRY/$MIGRATION_IMAGE_NAME:$TAG_NAME -f migration.Dockerfile .
+
+      - name: Push docker-compose images
+        run: docker-compose push
+
+      - name: Copy docker-compose.yaml config
+        uses: easingthemes/ssh-deploy@v5.0.3
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSHKEY }}
+          REMOTE_USER: ${{ secrets.SSH_USERNAME }}
+          REMOTE_HOST: ${{ secrets.SERVER_HOST }}
+          SOURCE: docker-compose.yaml
+          TARGET: /root/auth_server/.docker-compose.yaml
+
+  deploy:
+    runs-on: ubuntu-22.04
+    needs: images-build-and-push
+
+    steps:
+      - name: Deploy to Selectel Cloud via SSH action
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSHKEY }}
+          script: |
+            cd /root/auth_server/
+            export TAG_NAME=$(echo $GITHUB_SHA | head -c7)
+            docker-compose -f .docker-compose.yaml pull
+            docker-compose down || true
+            mv {.,}docker-compose.yaml
+            docker-compose up -d
