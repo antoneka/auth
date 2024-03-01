@@ -10,6 +10,9 @@ jobs:
   images-build-and-push:
     runs-on: ubuntu-22.04
 
+    env:
+      REGISTRY: "cr.selcloud.ru/antoneka"
+
     steps:
       - name: Checkout master
         uses: actions/checkout@v4
@@ -25,7 +28,7 @@ jobs:
           envkey_PG_PASSWORD: ${{ secrets.PG_PASSWORD }}
           envkey_PG_PORT: ${{ secrets.PG_PORT }}
           envkey_TAG_NAME: ${{ env.TAG_NAME }}
-          envkey_REGISTRY: "cr.selcloud.ru/antoneka"
+          envkey_REGISTRY: ${{ env.REGISTRY }}
           envkey_SERVER_IMAGE_NAME: "auth-server"
           envkey_SERVER_CONTAINER_NAME: "auth-server-container"
           envkey_MIGRATOR_IMAGE_NAME: "migrator"
