@@ -25,15 +25,30 @@ jobs:
       - name: Checkout master
         uses: actions/checkout@v4
 
+      - name: Add TAG_NAME env property with commit short sha
+        run: echo "TAG_NAME=`echo ${GITHUB_SHA} | cut -c1-7`" >> $GITHUB_ENV
+
+      - name: Make envfile
+        uses: SpicyPizza/create-envfile@v2.0.3
+        with:
+          envkey_PG_DATABASE_NAME: $PG_DATABASE_NAME
+          envkey_PG_USER: $PG_USER
+          envkey_PG_PASSWORD: $PG_PASSWORD
+          envkey_PG_PORT: $PG_PORT
+          envkey_TAG_NAME: ${TAG_NAME}
+          envkey_REGISTRY: $REGISTRY
+          envkey_SERVER_IMAGE_NAME: $SERVER_IMAGE_NAME
+          envkey_SERVER_CONTAINER_NAME: $SERVER_CONTAINER_NAME
+          envkey_MIGRATOR_IMAGE_NAME: $MIGRATOR_IMAGE_NAME
+          envkey_MIGRATION_DIR: $MIGRATION_DIR
+
       - name: Login to Docker Registry
         run: docker login -u ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.REGISTRY_PASSWORD }} $REGISTRY
 
       - name: Build docker-compose images
         run: |
-          TAG_NAME=$(echo $GITHUB_SHA | head -c7)
-          docker buildx create --use
-          docker buildx build --no-cache --push --tag $REGISTRY/$SERVER_IMAGE_NAME:$TAG_NAME -f Dockerfile .
-          docker buildx build --no-cache --push --tag $REGISTRY/$MIGRATION_IMAGE_NAME:$TAG_NAME -f migration.Dockerfile .
+          docker build --tag $REGISTRY/$SERVER_IMAGE_NAME:${TAG_NAME} -f Dockerfile .
+          docker build --tag $REGISTRY/$MIGRATOR_IMAGE_NAME:${TAG_NAME} -f migration.Dockerfile .
 
       - name: Push docker-compose images
         run: docker-compose push
@@ -46,6 +61,15 @@ jobs:
           REMOTE_HOST: ${{ secrets.SERVER_HOST }}
           SOURCE: docker-compose.yaml
           TARGET: /root/auth_server/.docker-compose.yaml
+
+      - name: Copy .env file
+        uses: easingthemes/ssh-deploy@v5.0.3
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSHKEY }}
+          REMOTE_USER: ${{ secrets.SSH_USERNAME }}
+          REMOTE_HOST: ${{ secrets.SERVER_HOST }}
+          SOURCE: .env
+          TARGET: /root/auth_server/.env
 
   deploy:
     runs-on: ubuntu-22.04
@@ -60,7 +84,6 @@ jobs:
           key: ${{ secrets.SSHKEY }}
           script: |
             cd /root/auth_server/
-            export TAG_NAME=$(echo $GITHUB_SHA | head -c7)
             docker-compose -f .docker-compose.yaml pull
             docker-compose down || true
             mv {.,}docker-compose.yaml
