@@ -16,17 +16,19 @@ services:
       - postgres_volume:/var/lib/postgresql/data
 
   migrator:
-    build:
-      context: .
     image: ${REGISTRY}/${MIGRATOR_IMAGE_NAME}:${TAG_NAME}
+    build: 
+      context: .
+      dockerfile: migration.Dockerfile
     restart: on-failure
     environment:
       db_host: pg
 
   server:
+    image: ${REGISTRY}/${SERVER_IMAGE_NAME}:${TAG_NAME}
     build:
       context: .
-    image: ${REGISTRY}/${SERVER_IMAGE_NAME}:${TAG_NAME}
+      dockerfile: Dockerfile
     container_name: ${SERVER_CONTAINER_NAME}
     ports:
       - "50051:50051"

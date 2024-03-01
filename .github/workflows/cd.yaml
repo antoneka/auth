@@ -6,13 +6,6 @@ on:
   pull_request:
     branches: [ main, master ]
 
-env:
-  REGISTRY: "cr.selcloud.ru/antoneka"
-  SERVER_IMAGE_NAME: "auth-server"
-  SERVER_CONTAINER_NAME: "auth-server-container"
-  MIGRATOR_IMAGE_NAME: "migrator"
-  MIGRATION_DIR: "./migrations"
-
 jobs:
   images-build-and-push:
     runs-on: ubuntu-22.04
@@ -32,22 +25,19 @@ jobs:
           envkey_PG_PASSWORD: ${{ secrets.PG_PASSWORD }}
           envkey_PG_PORT: ${{ secrets.PG_PORT }}
           envkey_TAG_NAME: ${{ env.TAG_NAME }}
-          envkey_REGISTRY: ${{ env.REGISTRY }}
-          envkey_SERVER_IMAGE_NAME: ${{ env.SERVER_IMAGE_NAME }}
-          envkey_SERVER_CONTAINER_NAME: ${{ env.SERVER_CONTAINER_NAME }}
-          envkey_MIGRATOR_IMAGE_NAME: ${{ env.MIGRATOR_IMAGE_NAME }}
-          envkey_MIGRATION_DIR: ${{ env.MIGRATION_DIR }}
+          envkey_REGISTRY: "cr.selcloud.ru/antoneka"
+          envkey_SERVER_IMAGE_NAME: "auth-server"
+          envkey_SERVER_CONTAINER_NAME: "auth-server-container"
+          envkey_MIGRATOR_IMAGE_NAME: "migrator"
+          envkey_MIGRATION_DIR: "./migrations"
 
       - name: Login to Docker Registry
         run: docker login -u ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.REGISTRY_PASSWORD }} $REGISTRY
 
-      - name: Build docker-compose images
+      - name: Build and Push docker-compose images
         run: |
-          docker build --tag $REGISTRY/$SERVER_IMAGE_NAME:$TAG_NAME -f Dockerfile .
-          docker build --tag $REGISTRY/$MIGRATOR_IMAGE_NAME:$TAG_NAME -f migration.Dockerfile .
-
-      - name: Push docker-compose images
-        run: docker-compose push
+          docker-compose build
+          docker-compose push
 
       - name: Copy docker-compose.yaml config
         uses: easingthemes/ssh-deploy@v5.0.3
@@ -83,4 +73,4 @@ jobs:
             docker-compose -f .docker-compose.yaml pull
             docker-compose down || true
             mv {.,}docker-compose.yaml
-            docker-compose up -d --build
+            docker-compose up -d
