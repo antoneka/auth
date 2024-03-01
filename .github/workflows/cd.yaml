@@ -6,20 +6,16 @@ on:
   pull_request:
     branches: [ main, master ]
 
+env:
+  REGISTRY: "cr.selcloud.ru/antoneka"
+  SERVER_IMAGE_NAME: "auth-server"
+  SERVER_CONTAINER_NAME: "auth-server-container"
+  MIGRATOR_IMAGE_NAME: "migrator"
+  MIGRATION_DIR: "./migrations"
+
 jobs:
   images-build-and-push:
     runs-on: ubuntu-22.04
-
-    env:
-      PG_DATABASE_NAME: ${{ secrets.PG_DATABASE_NAME }}
-      PG_USER: ${{ secrets.PG_USER }}
-      PG_PASSWORD: ${{ secrets.PG_PASSWORD }}
-      PG_PORT: ${{ secrets.PG_PORT }}
-      REGISTRY: "cr.selcloud.ru/antoneka"
-      SERVER_IMAGE_NAME: "auth-server"
-      SERVER_CONTAINER_NAME: "auth-server-container"
-      MIGRATOR_IMAGE_NAME: "migrator"
-      MIGRATION_DIR: "./migrations"
 
     steps:
       - name: Checkout master
@@ -31,24 +27,24 @@ jobs:
       - name: Make envfile
         uses: SpicyPizza/create-envfile@v2.0.3
         with:
-          envkey_PG_DATABASE_NAME: $PG_DATABASE_NAME
-          envkey_PG_USER: $PG_USER
-          envkey_PG_PASSWORD: $PG_PASSWORD
-          envkey_PG_PORT: $PG_PORT
-          envkey_TAG_NAME: ${TAG_NAME}
-          envkey_REGISTRY: $REGISTRY
-          envkey_SERVER_IMAGE_NAME: $SERVER_IMAGE_NAME
-          envkey_SERVER_CONTAINER_NAME: $SERVER_CONTAINER_NAME
-          envkey_MIGRATOR_IMAGE_NAME: $MIGRATOR_IMAGE_NAME
-          envkey_MIGRATION_DIR: $MIGRATION_DIR
+          envkey_PG_DATABASE_NAME: ${{ secrets.PG_DATABASE_NAME }}
+          envkey_PG_USER: ${{ secrets.PG_USER }}
+          envkey_PG_PASSWORD: ${{ secrets.PG_PASSWORD }}
+          envkey_PG_PORT: ${{ secrets.PG_PORT }}
+          envkey_TAG_NAME: ${{ env.TAG_NAME }}
+          envkey_REGISTRY: ${{ env.REGISTRY }}
+          envkey_SERVER_IMAGE_NAME: ${{ env.SERVER_IMAGE_NAME }}
+          envkey_SERVER_CONTAINER_NAME: ${{ env.SERVER_CONTAINER_NAME }}
+          envkey_MIGRATOR_IMAGE_NAME: ${{ env.MIGRATOR_IMAGE_NAME }}
+          envkey_MIGRATION_DIR: ${{ env.MIGRATION_DIR }}
 
       - name: Login to Docker Registry
         run: docker login -u ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.REGISTRY_PASSWORD }} $REGISTRY
 
       - name: Build docker-compose images
         run: |
-          docker build --tag $REGISTRY/$SERVER_IMAGE_NAME:${TAG_NAME} -f Dockerfile .
-          docker build --tag $REGISTRY/$MIGRATOR_IMAGE_NAME:${TAG_NAME} -f migration.Dockerfile .
+          docker build --tag $REGISTRY/$SERVER_IMAGE_NAME:$TAG_NAME -f Dockerfile .
+          docker build --tag $REGISTRY/$MIGRATOR_IMAGE_NAME:$TAG_NAME -f migration.Dockerfile .
 
       - name: Push docker-compose images
         run: docker-compose push
@@ -87,4 +83,4 @@ jobs:
             docker-compose -f .docker-compose.yaml pull
             docker-compose down || true
             mv {.,}docker-compose.yaml
-            docker-compose up -d
+            docker-compose up -d --build
