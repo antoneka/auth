@@ -31,7 +31,7 @@ jobs:
           envkey_REGISTRY: ${{ env.REGISTRY }}
           envkey_SERVER_IMAGE_NAME: "auth-server"
           envkey_SERVER_CONTAINER_NAME: "auth-server-container"
-          envkey_MIGRATOR_IMAGE_NAME: "migrator"
+          envkey_MIGRATOR_IMAGE_NAME: "auth-migrator"
           envkey_MIGRATION_DIR: "./migrations"
 
       - name: Login to Docker Registry
