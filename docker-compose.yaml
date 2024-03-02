@@ -14,15 +14,22 @@ services:
       - "${PG_PORT}:5432"
     volumes:
       - postgres_volume:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${PG_USER}" ]
+      interval: 5s
+      timeout: 5s
+      retries: 3
 
   migrator:
     image: ${REGISTRY}/${MIGRATOR_IMAGE_NAME}:${TAG_NAME}
     build:
       context: .
       dockerfile: migration.Dockerfile
-    restart: on-failure
+    depends_on:
+      pg:
+        condition: service_healthy
     environment:
-      db_host: pg
+      DB_HOST: pg
 
   server:
     image: ${REGISTRY}/${SERVER_IMAGE_NAME}:${TAG_NAME}
@@ -32,3 +39,4 @@ services:
     container_name: ${SERVER_CONTAINER_NAME}
     ports:
       - "50051:50051"
+    restart: on-failure
