@@ -35,7 +35,6 @@ jobs:
           envkey_MIGRATION_DIR: "./migrations"
           envkey_PG_DSN: host=pg port=5432 dbname=${{ secrets.PG_DATABASE_NAME }} user=${{ secrets.PG_USER }} password=${{ secrets.PG_PASSWORD }} sslmode=disable
           envkey_MIGRATION_DSN: host=pg port=5432 dbname=${{ secrets.PG_DATABASE_NAME }} user=${{ secrets.PG_USER }} password=${{ secrets.PG_PASSWORD }} sslmode=disable
-          envkey_GRPC_HOST: ${{ secrets.GRPC_HOST }}
           envkey_GRPC_PORT: ${{ secrets.GRPC_PORT }}
 
       - name: Login to Docker Registry

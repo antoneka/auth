@@ -77,7 +77,7 @@ func main() {
 	ctx := context.Background()
 	cfg := config.MustLoad()
 
-	lis, err := net.Listen("tcp", fmt.Sprintf("%s:%s", cfg.GRPC.Host, cfg.GRPC.Port))
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", cfg.GRPC.Port))
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
