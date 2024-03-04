@@ -38,5 +38,5 @@ services:
       dockerfile: Dockerfile
     container_name: ${SERVER_CONTAINER_NAME}
     ports:
-      - "50051:50051"
+      - "${GRPC_PORT}:50051"
     restart: on-failure
