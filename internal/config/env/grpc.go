@@ -6,7 +6,7 @@ import (
 )
 
 const (
-	grpcPortEnvName = "GRPC_PORT"
+	grpcPortEnvName = "GRPC_CONTAINER_PORT"
 )
 
 // GRPCConfig represents the configuration for a gRPC server.

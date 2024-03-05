@@ -27,15 +27,17 @@ jobs:
           envkey_PG_USER: ${{ secrets.PG_USER }}
           envkey_PG_PASSWORD: ${{ secrets.PG_PASSWORD }}
           envkey_PG_PORT: ${{ secrets.PG_PORT }}
+          envkey_PG_CONTAINER_PORT: ${{ secrets.PG_CONTAINER_PORT }}
           envkey_TAG_NAME: ${{ env.TAG_NAME }}
           envkey_REGISTRY: ${{ env.REGISTRY }}
           envkey_SERVER_IMAGE_NAME: "auth-server"
           envkey_SERVER_CONTAINER_NAME: "auth-server-container"
           envkey_MIGRATOR_IMAGE_NAME: "auth-migrator"
           envkey_MIGRATION_DIR: "./migrations"
-          envkey_PG_DSN: host=pg port=5432 dbname=${{ secrets.PG_DATABASE_NAME }} user=${{ secrets.PG_USER }} password=${{ secrets.PG_PASSWORD }} sslmode=disable
-          envkey_MIGRATION_DSN: host=pg port=5432 dbname=${{ secrets.PG_DATABASE_NAME }} user=${{ secrets.PG_USER }} password=${{ secrets.PG_PASSWORD }} sslmode=disable
+          envkey_PG_DSN: host=pg port=${{ secrets.PG_CONTAINER_PORT }} dbname=${{ secrets.PG_DATABASE_NAME }} user=${{ secrets.PG_USER }} password=${{ secrets.PG_PASSWORD }} sslmode=disable
+          envkey_MIGRATION_DSN: host=pg port=${{ secrets.PG_CONTAINER_PORT }} dbname=${{ secrets.PG_DATABASE_NAME }} user=${{ secrets.PG_USER }} password=${{ secrets.PG_PASSWORD }} sslmode=disable
           envkey_GRPC_PORT: ${{ secrets.GRPC_PORT }}
+          envkey_GRPC_CONTAINER_PORT: ${{ secrets.GRPC_CONTAINER_PORT }}
 
       - name: Login to Docker Registry
         run: docker login -u ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.REGISTRY_PASSWORD }} $REGISTRY
