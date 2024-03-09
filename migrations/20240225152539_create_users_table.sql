@@ -1,5 +1,6 @@
 -- +goose Up
-CREATE TABLE users (
+-- +goose StatementBegin
+CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
     name TEXT NOT NULL,
     email TEXT NOT NULL,
@@ -8,6 +9,9 @@ CREATE TABLE users (
     created_at TIMESTAMP NOT NULL DEFAULT now(),
     updated_at TIMESTAMP
 );
+-- +goose StatementEnd
 
 -- +goose Down
-DROP TABLE users;
+-- +goose StatementBegin
+DROP TABLE IF EXISTS users;
+-- +goose StatementEnd

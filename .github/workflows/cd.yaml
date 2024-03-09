@@ -23,7 +23,6 @@ jobs:
       - name: Make envfile
         uses: SpicyPizza/create-envfile@v2.0.3
         with:
-          envkey_PG_DATABASE_NAME: ${{ secrets.PG_DATABASE_NAME }}
           envkey_PG_USER: ${{ secrets.PG_USER }}
           envkey_PG_PASSWORD: ${{ secrets.PG_PASSWORD }}
           envkey_PG_PORT: ${{ secrets.PG_PORT }}
@@ -34,7 +33,7 @@ jobs:
           envkey_SERVER_CONTAINER_NAME: "auth-server-container"
           envkey_MIGRATOR_IMAGE_NAME: "auth-migrator"
           envkey_MIGRATION_DIR: "./migrations"
-          envkey_PG_DSN: "host=pg port=${{ secrets.PG_CONTAINER_PORT }} dbname=${{ secrets.PG_DATABASE_NAME }} user=${{ secrets.PG_USER }} password=${{ secrets.PG_PASSWORD }} sslmode=disable"
+          envkey_PG_DSN: "host=pg port=${{ secrets.PG_CONTAINER_PORT }} user=${{ secrets.PG_USER }} password=${{ secrets.PG_PASSWORD }} sslmode=disable"
           envkey_GRPC_PORT: ${{ secrets.GRPC_PORT }}
           envkey_GRPC_CONTAINER_PORT: ${{ secrets.GRPC_CONTAINER_PORT }}
 
