@@ -20,7 +20,7 @@ func StorageToServiceUserInfo(userInfo modelStore.UserInfo) model.UserInfo {
 	return model.UserInfo{
 		Name:     userInfo.Name,
 		Email:    userInfo.Email,
-		Password: "",
-		Role:     userInfo.Role,
+		Password: userInfo.Password,
+		Role:     model.Role(userInfo.Role),
 	}
 }

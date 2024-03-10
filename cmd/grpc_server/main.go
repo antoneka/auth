@@ -9,11 +9,11 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 	"google.golang.org/protobuf/types/known/emptypb"
-	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/antoneka/auth/internal/model"
-	"github.com/antoneka/auth/internal/storage"
-	"github.com/antoneka/auth/internal/storage/user"
+	"github.com/antoneka/auth/internal/converter"
+	"github.com/antoneka/auth/internal/service"
+	userService "github.com/antoneka/auth/internal/service/user"
+	userStorage "github.com/antoneka/auth/internal/storage/user"
 	"github.com/jackc/pgx/v4/pgxpool"
 
 	"github.com/antoneka/auth/internal/config"
@@ -22,7 +22,7 @@ import (
 
 type server struct {
 	desc.UnimplementedUserV1Server
-	userStorage storage.UserStorage
+	userService service.UserService
 }
 
 // Create creates a new user.
@@ -30,16 +30,11 @@ func (s *server) Create(
 	ctx context.Context,
 	req *desc.CreateRequest,
 ) (*desc.CreateResponse, error) {
-	userInfo := &model.UserInfo{
-		Name:     req.GetName(),
-		Email:    req.GetEmail(),
-		Password: req.GetPassword(),
-		Role:     desc.Role_name[int32(req.Role)],
-	}
+	userInfo := converter.CreateRequestToService(req)
 
-	id, err := s.userStorage.Create(ctx, userInfo)
+	id, err := s.userService.Create(ctx, userInfo)
 	if err != nil {
-		log.Fatal(err)
+		return &desc.CreateResponse{}, err
 	}
 
 	return &desc.CreateResponse{
@@ -54,24 +49,12 @@ func (s *server) Get(
 ) (*desc.GetResponse, error) {
 	id := req.GetId()
 
-	user, err := s.userStorage.Get(ctx, id)
+	user, err := s.userService.Get(ctx, id)
 	if err != nil {
-		log.Fatal(err)
+		return &desc.GetResponse{}, nil
 	}
 
-	var updatedAt *timestamppb.Timestamp
-	if user.UpdatedAt.Valid {
-		updatedAt = timestamppb.New(user.UpdatedAt.Time)
-	}
-
-	return &desc.GetResponse{
-		Id:        user.ID,
-		Name:      user.UserInfo.Name,
-		Email:     user.UserInfo.Email,
-		Role:      desc.Role(desc.Role_value[user.UserInfo.Role]),
-		CreatedAt: timestamppb.New(user.CreatedAt),
-		UpdatedAt: updatedAt,
-	}, nil
+	return converter.ServiceToGetResponse(user), nil
 }
 
 // Update updates user information.
@@ -79,10 +62,12 @@ func (s *server) Update(
 	ctx context.Context,
 	req *desc.UpdateRequest,
 ) (*emptypb.Empty, error) {
-	_, cancel := context.WithCancel(ctx)
-	defer cancel()
+	user := converter.UpdateRequestToService(req)
 
-	fmt.Printf("+%v\n", req)
+	err := s.userService.Update(ctx, user)
+	if err != nil {
+		return &emptypb.Empty{}, nil
+	}
 
 	return &emptypb.Empty{}, nil
 }
@@ -92,10 +77,12 @@ func (s *server) Delete(
 	ctx context.Context,
 	req *desc.DeleteRequest,
 ) (*emptypb.Empty, error) {
-	_, cancel := context.WithCancel(ctx)
-	defer cancel()
+	id := req.GetId()
 
-	fmt.Printf("%+v\n", req)
+	err := s.userService.Delete(ctx, id)
+	if err != nil {
+		return &emptypb.Empty{}, err
+	}
 
 	return &emptypb.Empty{}, nil
 }
@@ -117,7 +104,13 @@ func main() {
 
 	s := grpc.NewServer()
 	reflection.Register(s)
-	desc.RegisterUserV1Server(s, &server{userStorage: user.NewStorage(pool)})
+
+	userStorage := userStorage.NewStorage(pool)
+	userService := userService.NewService(userStorage)
+
+	desc.RegisterUserV1Server(s, &server{
+		userService: userService,
+	})
 
 	log.Printf("server listening at %v", lis.Addr())
 

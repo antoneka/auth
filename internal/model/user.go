@@ -5,6 +5,18 @@ import (
 	"time"
 )
 
+// Role ...
+type Role string
+
+const (
+	// UNKNOWN ...
+	UNKNOWN Role = "UNKNOWN_CHANGE_TYPE"
+	// USER ...
+	USER Role = "USER"
+	// ADMIN ...
+	ADMIN Role = "ADMIN"
+)
+
 // User ...
 type User struct {
 	ID        int64
@@ -18,5 +30,5 @@ type UserInfo struct {
 	Name     string
 	Email    string
 	Password string
-	Role     string
+	Role     Role
 }
