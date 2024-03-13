@@ -2,6 +2,7 @@ package config
 
 import (
 	"flag"
+	"log"
 
 	"github.com/antoneka/auth/internal/config/env"
 	"github.com/joho/godotenv"
@@ -22,17 +23,17 @@ func MustLoad() *Config {
 
 	err := godotenv.Load(configPath)
 	if err != nil {
-		panic("env file was not found")
+		log.Panicf("failed to load .env file: %v", err)
 	}
 
 	grpcConfig, err := env.NewGRPCConfig()
 	if err != nil {
-		panic(err)
+		log.Panicf("failed to load gRPC config: %v", err)
 	}
 
 	pgConfig, err := env.NewPGConfig()
 	if err != nil {
-		panic(err)
+		log.Panicf("failed to load PostgreSQL config: %v", err)
 	}
 
 	return &Config{
