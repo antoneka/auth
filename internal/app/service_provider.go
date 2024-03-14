@@ -5,19 +5,20 @@ import (
 	"log"
 
 	"github.com/antoneka/auth/internal/api/user"
+	"github.com/antoneka/auth/internal/client/db"
+	"github.com/antoneka/auth/internal/client/db/pg"
 	"github.com/antoneka/auth/internal/closer"
 	"github.com/antoneka/auth/internal/config"
 	"github.com/antoneka/auth/internal/service"
 	userServ "github.com/antoneka/auth/internal/service/user"
 	"github.com/antoneka/auth/internal/storage"
 	userStore "github.com/antoneka/auth/internal/storage/user"
-	"github.com/jackc/pgx/v4/pgxpool"
 )
 
 type serviceProvider struct {
 	config *config.Config
 
-	pgPool      *pgxpool.Pool
+	dbClient    db.Client
 	userStorage storage.UserStorage
 
 	userService service.UserService
@@ -38,34 +39,31 @@ func (s *serviceProvider) Config() *config.Config {
 	return s.config
 }
 
-// PgPool returns the database connection pool.
-func (s *serviceProvider) PgPool(ctx context.Context) *pgxpool.Pool {
-	if s.pgPool == nil {
-		pool, err := pgxpool.Connect(ctx, s.Config().PG.DSN)
+// DBClient returns the database client.
+func (s *serviceProvider) DBClient(ctx context.Context) db.Client {
+	if s.dbClient == nil {
+		client, err := pg.New(ctx, s.Config().PG.DSN)
 		if err != nil {
-			log.Panicf("failed to connect to database: %v", err)
+			log.Panicf("failed to create db client %v", err)
 		}
 
-		err = pool.Ping(ctx)
+		err = client.DB().Ping(ctx)
 		if err != nil {
 			log.Panicf("ping error: %v", err)
 		}
 
-		closer.Add(func() error {
-			pool.Close()
-			return nil
-		})
+		closer.Add(client.Close)
 
-		s.pgPool = pool
+		s.dbClient = client
 	}
 
-	return s.pgPool
+	return s.dbClient
 }
 
 // UserStorage returns the user storage instance.
 func (s *serviceProvider) UserStorage(ctx context.Context) storage.UserStorage {
 	if s.userStorage == nil {
-		s.userStorage = userStore.NewStorage(s.PgPool(ctx))
+		s.userStorage = userStore.NewStorage(s.DBClient(ctx))
 	}
 
 	return s.userStorage

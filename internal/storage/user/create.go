@@ -5,10 +5,11 @@ import (
 	"fmt"
 
 	sq "github.com/Masterminds/squirrel"
+	"github.com/antoneka/auth/internal/client/db"
 	"github.com/antoneka/auth/internal/model"
 )
 
-// Create ...
+// Create creates a new user record in the database.
 func (r *store) Create(
 	ctx context.Context,
 	info *model.UserInfo,
@@ -26,8 +27,13 @@ func (r *store) Create(
 		return 0, fmt.Errorf("%s: %w", op, err)
 	}
 
+	q := db.Query{
+		Name:     op,
+		QueryRaw: query,
+	}
+
 	var id int64
-	err = r.db.QueryRow(ctx, query, args...).Scan(&id)
+	err = r.db.DB().ScanOneContext(ctx, &id, q, args...)
 	if err != nil {
 		return 0, fmt.Errorf("%s: %w", op, err)
 	}

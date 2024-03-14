@@ -5,10 +5,11 @@ import (
 	"fmt"
 
 	sq "github.com/Masterminds/squirrel"
+	"github.com/antoneka/auth/internal/client/db"
 	"github.com/antoneka/auth/internal/model"
 )
 
-// Update ...
+// Update updates a user record in the database with the provided user information.
 func (r *store) Update(
 	ctx context.Context,
 	user *model.User,
@@ -29,7 +30,12 @@ func (r *store) Update(
 		return fmt.Errorf("%s: %w", op, err)
 	}
 
-	_, err = r.db.Exec(ctx, query, args...)
+	q := db.Query{
+		Name:     op,
+		QueryRaw: query,
+	}
+
+	_, err = r.db.DB().ExecContext(ctx, q, args...)
 	if err != nil {
 		return fmt.Errorf("%s: %w", op, err)
 	}

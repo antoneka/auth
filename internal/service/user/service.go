@@ -11,7 +11,7 @@ type serv struct {
 	userStorage storage.UserStorage
 }
 
-// NewService ...
+// NewService creates a new instance of the UserService interface.
 func NewService(userStorage storage.UserStorage) service.UserService {
 	return &serv{
 		userStorage: userStorage,

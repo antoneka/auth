@@ -6,7 +6,7 @@ import (
 	"github.com/antoneka/auth/internal/model"
 )
 
-// UserStorage ...
+// UserStorage defines the interface for interacting with user data in the storage.
 type UserStorage interface {
 	Create(ctx context.Context, info *model.UserInfo) (int64, error)
 	Get(ctx context.Context, id int64) (*model.User, error)

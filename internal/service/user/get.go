@@ -7,7 +7,7 @@ import (
 	"github.com/antoneka/auth/internal/model"
 )
 
-// Get ...
+// Get retrieves the user with the specified ID from the user storage.
 func (s *serv) Get(
 	ctx context.Context,
 	id int64,

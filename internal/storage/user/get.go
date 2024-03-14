@@ -5,12 +5,13 @@ import (
 	"fmt"
 
 	sq "github.com/Masterminds/squirrel"
+	"github.com/antoneka/auth/internal/client/db"
 	"github.com/antoneka/auth/internal/model"
 	"github.com/antoneka/auth/internal/storage/user/converter"
 	modelStore "github.com/antoneka/auth/internal/storage/user/model"
 )
 
-// Get ...
+// Get retrieves a user record from the database based on the provided ID.
 func (r *store) Get(
 	ctx context.Context,
 	id int64,
@@ -28,8 +29,13 @@ func (r *store) Get(
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}
 
+	q := db.Query{
+		Name:     op,
+		QueryRaw: query,
+	}
+
 	var user modelStore.User
-	err = r.db.QueryRow(ctx, query, args...).Scan(&user.ID, &user.UserInfo.Name, &user.UserInfo.Email, &user.UserInfo.Password, &user.UserInfo.Role, &user.CreatedAt, &user.UpdatedAt)
+	err = r.db.DB().ScanOneContext(ctx, &user, q, args...)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}

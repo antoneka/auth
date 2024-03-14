@@ -5,19 +5,19 @@ import (
 	"time"
 )
 
-// Role ...
+// Role represents the role of a user.
 type Role string
 
 const (
-	// UNKNOWN ...
+	// UNKNOWN is a stub in the role enum.
 	UNKNOWN Role = "UNKNOWN_CHANGE_TYPE"
-	// USER ...
+	// USER represents a user role.
 	USER Role = "USER"
-	// ADMIN ...
+	// ADMIN represents an admin role.
 	ADMIN Role = "ADMIN"
 )
 
-// User ...
+// User represents a user entity.
 type User struct {
 	ID        int64
 	UserInfo  UserInfo
@@ -25,7 +25,7 @@ type User struct {
 	UpdatedAt sql.NullTime
 }
 
-// UserInfo ...
+// UserInfo contains user-specific information.
 type UserInfo struct {
 	Name     string
 	Email    string

@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-// Delete ...
+// Delete deletes the user with the specified ID from the user storage.
 func (s *serv) Delete(
 	ctx context.Context,
 	id int64,

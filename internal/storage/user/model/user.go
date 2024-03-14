@@ -5,18 +5,18 @@ import (
 	"time"
 )
 
-// User ...
+// User represents a user entity in the database.
 type User struct {
-	ID        int64
-	UserInfo  UserInfo
-	CreatedAt time.Time
-	UpdatedAt sql.NullTime
+	ID        int64        `db:"id"`
+	UserInfo  UserInfo     `db:""`
+	CreatedAt time.Time    `db:"created_at"`
+	UpdatedAt sql.NullTime `db:"updated_at"`
 }
 
-// UserInfo ...
+// UserInfo represents detailed information about a user.
 type UserInfo struct {
-	Name     string
-	Email    string
-	Password string
-	Role     string
+	Name     string `db:"name"`
+	Email    string `db:"email"`
+	Password string `db:"password"`
+	Role     string `db:"role"`
 }

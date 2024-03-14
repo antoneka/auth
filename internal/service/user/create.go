@@ -7,7 +7,7 @@ import (
 	"github.com/antoneka/auth/internal/model"
 )
 
-// Create ...
+// Create creates a new user based on the provided user information.
 func (s *serv) Create(
 	ctx context.Context,
 	info *model.UserInfo,

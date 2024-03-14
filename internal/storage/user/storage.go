@@ -1,8 +1,7 @@
 package user
 
 import (
-	"github.com/jackc/pgx/v4/pgxpool"
-
+	"github.com/antoneka/auth/internal/client/db"
 	"github.com/antoneka/auth/internal/storage"
 )
 
@@ -21,10 +20,10 @@ const (
 var _ storage.UserStorage = (*store)(nil)
 
 type store struct {
-	db *pgxpool.Pool
+	db db.Client
 }
 
-// NewStorage ...
-func NewStorage(db *pgxpool.Pool) storage.UserStorage {
+// NewStorage creates a new instance of UserStorage.
+func NewStorage(db db.Client) storage.UserStorage {
 	return &store{db: db}
 }

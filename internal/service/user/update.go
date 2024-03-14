@@ -9,7 +9,7 @@ import (
 	"github.com/antoneka/auth/internal/model"
 )
 
-// Update ...
+// Update updates the user information based on the provided user object.
 func (s *serv) Update(
 	ctx context.Context,
 	user *model.User,

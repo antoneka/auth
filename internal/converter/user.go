@@ -7,7 +7,7 @@ import (
 	desc "github.com/antoneka/auth/pkg/user_v1"
 )
 
-// ServiceToGetResponse ...
+// ServiceToGetResponse converts a user model from the service layer to a gRPC response.
 func ServiceToGetResponse(user *model.User) *desc.GetResponse {
 	var updatedAt *timestamppb.Timestamp
 
@@ -25,7 +25,7 @@ func ServiceToGetResponse(user *model.User) *desc.GetResponse {
 	}
 }
 
-// UpdateRequestToService ...
+// UpdateRequestToService converts a gRPC update request to a service layer user model.
 func UpdateRequestToService(updateRequest *desc.UpdateRequest) *model.User {
 	userInfo := model.UserInfo{
 		Name:     updateRequest.GetName(),
@@ -40,7 +40,7 @@ func UpdateRequestToService(updateRequest *desc.UpdateRequest) *model.User {
 	}
 }
 
-// CreateRequestToService ...
+// CreateRequestToService converts a gRPC create request to a service layer user information model.
 func CreateRequestToService(createRequest *desc.CreateRequest) *model.UserInfo {
 	return &model.UserInfo{
 		Name:     createRequest.GetName(),
@@ -50,12 +50,12 @@ func CreateRequestToService(createRequest *desc.CreateRequest) *model.UserInfo {
 	}
 }
 
-// GRPCToServiceRole ...
+// GRPCToServiceRole converts a gRPC role to a service layer role.
 func GRPCToServiceRole(role desc.Role) model.Role {
 	return model.Role(desc.Role_name[int32(role)])
 }
 
-// ServiceToGRPCRole ...
+// ServiceToGRPCRole converts a service layer role to a gRPC role.
 func ServiceToGRPCRole(role model.Role) desc.Role {
 	return desc.Role(desc.Role_value[string(role)])
 }

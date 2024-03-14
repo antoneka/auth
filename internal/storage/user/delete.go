@@ -5,9 +5,10 @@ import (
 	"fmt"
 
 	sq "github.com/Masterminds/squirrel"
+	"github.com/antoneka/auth/internal/client/db"
 )
 
-// Delete ...
+// Delete deletes a user record from the database based on the provided ID.
 func (r *store) Delete(
 	ctx context.Context,
 	id int64,
@@ -23,7 +24,12 @@ func (r *store) Delete(
 		return fmt.Errorf("%s: %w", op, err)
 	}
 
-	_, err = r.db.Exec(ctx, query, args...)
+	q := db.Query{
+		Name:     op,
+		QueryRaw: query,
+	}
+
+	_, err = r.db.DB().ExecContext(ctx, q, args...)
 	if err != nil {
 		return fmt.Errorf("%s: %w", op, err)
 	}
