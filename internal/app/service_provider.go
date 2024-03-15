@@ -7,6 +7,7 @@ import (
 	"github.com/antoneka/auth/internal/api/user"
 	"github.com/antoneka/auth/internal/client/db"
 	"github.com/antoneka/auth/internal/client/db/pg"
+	"github.com/antoneka/auth/internal/client/db/transaction"
 	"github.com/antoneka/auth/internal/closer"
 	"github.com/antoneka/auth/internal/config"
 	"github.com/antoneka/auth/internal/service"
@@ -15,10 +16,12 @@ import (
 	userStore "github.com/antoneka/auth/internal/storage/user"
 )
 
+// serviceProvider is a DI container that manages service dependencies.
 type serviceProvider struct {
 	config *config.Config
 
 	dbClient    db.Client
+	txManager   db.TxManager
 	userStorage storage.UserStorage
 
 	userService service.UserService
@@ -60,6 +63,15 @@ func (s *serviceProvider) DBClient(ctx context.Context) db.Client {
 	return s.dbClient
 }
 
+// TxManager returns the transaction manager.
+func (s *serviceProvider) TxManager(ctx context.Context) db.TxManager {
+	if s.txManager == nil {
+		s.txManager = transaction.NewTransactionManager(s.DBClient(ctx).DB())
+	}
+
+	return s.txManager
+}
+
 // UserStorage returns the user storage instance.
 func (s *serviceProvider) UserStorage(ctx context.Context) storage.UserStorage {
 	if s.userStorage == nil {
@@ -72,7 +84,10 @@ func (s *serviceProvider) UserStorage(ctx context.Context) storage.UserStorage {
 // UserService returns the user service instance.
 func (s *serviceProvider) UserService(ctx context.Context) service.UserService {
 	if s.userService == nil {
-		s.userService = userServ.NewService(s.UserStorage(ctx))
+		s.userService = userServ.NewService(
+			s.UserStorage(ctx),
+			s.TxManager(ctx),
+		)
 	}
 
 	return s.userService

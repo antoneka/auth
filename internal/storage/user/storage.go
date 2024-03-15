@@ -19,6 +19,7 @@ const (
 
 var _ storage.UserStorage = (*store)(nil)
 
+// store represents the implementation of the UserStorage interface.
 type store struct {
 	db db.Client
 }

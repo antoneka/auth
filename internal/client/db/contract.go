@@ -7,6 +7,19 @@ import (
 	"github.com/jackc/pgx/v4"
 )
 
+// Handler represents a function signature for handling transactions.
+type Handler func(ctx context.Context) error
+
+// TxManager is an interface for managing transactions with different isolation levels.
+type TxManager interface {
+	ReadCommitted(ctx context.Context, f Handler) error
+}
+
+// Transactor is an interface for initiating database transactions.
+type Transactor interface {
+	BeginTx(ctx context.Context, txOptions pgx.TxOptions) (pgx.Tx, error)
+}
+
 // Client represents a client for interacting with the database.
 type Client interface {
 	DB() DB
@@ -46,6 +59,7 @@ type Pinger interface {
 // DB represents a database connection.
 type DB interface {
 	SQLExecer
+	Transactor
 	Pinger
 	Close()
 }

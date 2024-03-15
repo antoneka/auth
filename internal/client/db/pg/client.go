@@ -8,6 +8,7 @@ import (
 	"github.com/pkg/errors"
 )
 
+// pgClient represents the implementation of the database client interface.
 type pgClient struct {
 	masterDBC db.DB
 }
