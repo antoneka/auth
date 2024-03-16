@@ -13,6 +13,7 @@ import (
 	"github.com/antoneka/auth/internal/service"
 	userServ "github.com/antoneka/auth/internal/service/user"
 	"github.com/antoneka/auth/internal/storage"
+	logStore "github.com/antoneka/auth/internal/storage/log"
 	userStore "github.com/antoneka/auth/internal/storage/user"
 )
 
@@ -22,6 +23,7 @@ type serviceProvider struct {
 
 	dbClient    db.Client
 	txManager   db.TxManager
+	logStorage  storage.LogStorage
 	userStorage storage.UserStorage
 
 	userService service.UserService
@@ -45,7 +47,7 @@ func (s *serviceProvider) Config() *config.Config {
 // DBClient returns the database client.
 func (s *serviceProvider) DBClient(ctx context.Context) db.Client {
 	if s.dbClient == nil {
-		client, err := pg.New(ctx, s.Config().PG.DSN)
+		client, err := pg.NewDBClient(ctx, s.Config().PG.DSN)
 		if err != nil {
 			log.Panicf("failed to create db client %v", err)
 		}
@@ -72,6 +74,14 @@ func (s *serviceProvider) TxManager(ctx context.Context) db.TxManager {
 	return s.txManager
 }
 
+func (s *serviceProvider) LogStorage(ctx context.Context) storage.LogStorage {
+	if s.logStorage == nil {
+		s.logStorage = logStore.NewLogStorage(s.DBClient(ctx))
+	}
+
+	return s.logStorage
+}
+
 // UserStorage returns the user storage instance.
 func (s *serviceProvider) UserStorage(ctx context.Context) storage.UserStorage {
 	if s.userStorage == nil {
@@ -86,6 +96,7 @@ func (s *serviceProvider) UserService(ctx context.Context) service.UserService {
 	if s.userService == nil {
 		s.userService = userServ.NewService(
 			s.UserStorage(ctx),
+			s.LogStorage(ctx),
 			s.TxManager(ctx),
 		)
 	}

@@ -13,3 +13,8 @@ type UserStorage interface {
 	Update(ctx context.Context, user *model.User) error
 	Delete(ctx context.Context, id int64) error
 }
+
+// LogStorage defines the interface for logging user actions.
+type LogStorage interface {
+	Log(ctx context.Context, log *model.LogUser) error
+}

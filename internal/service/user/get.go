@@ -14,7 +14,26 @@ func (s *serv) Get(
 ) (*model.User, error) {
 	const op = "service.user.Get"
 
-	user, err := s.userStorage.Get(ctx, id)
+	var user *model.User
+
+	err := s.txManager.ReadCommitted(ctx, func(context.Context) error {
+		var errTx error
+		user, errTx = s.userStorage.Get(ctx, id)
+		if errTx != nil {
+			return errTx
+		}
+
+		errTx = s.logStorage.Log(ctx, &model.LogUser{
+			UserID: id,
+			Action: model.LogActionGetUser,
+		})
+		if errTx != nil {
+			return errTx
+		}
+
+		return nil
+	})
+
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}

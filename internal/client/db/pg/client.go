@@ -2,10 +2,10 @@ package pg
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/antoneka/auth/internal/client/db"
 	"github.com/jackc/pgx/v4/pgxpool"
-	"github.com/pkg/errors"
 )
 
 // pgClient represents the implementation of the database client interface.
@@ -13,11 +13,11 @@ type pgClient struct {
 	masterDBC db.DB
 }
 
-// New creates a new PostgreSQL client instance.
-func New(ctx context.Context, dsn string) (db.Client, error) {
+// NewDBClient creates a new PostgreSQL client instance.
+func NewDBClient(ctx context.Context, dsn string) (db.Client, error) {
 	dbc, err := pgxpool.Connect(ctx, dsn)
 	if err != nil {
-		return nil, errors.Errorf("failed to connect to db: %v", err)
+		return nil, fmt.Errorf("failed to connect to db: %v", err)
 	}
 
 	return &pgClient{

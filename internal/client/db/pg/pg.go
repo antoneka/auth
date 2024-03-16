@@ -95,6 +95,10 @@ func (p *pg) Ping(ctx context.Context) error {
 	return p.dbc.Ping(ctx)
 }
 
+func (p *pg) Pool() *pgxpool.Pool {
+	return p.dbc
+}
+
 // Close closes the database connection.
 func (p *pg) Close() {
 	p.dbc.Close()
@@ -111,10 +115,9 @@ func MakeContextTx(ctx context.Context, tx pgx.Tx) context.Context {
 }
 
 // logQuery logs the SQL query.
-func logQuery(ctx context.Context, q db.Query, args ...interface{}) {
+func logQuery(_ context.Context, q db.Query, args ...interface{}) {
 	prettyQuery := prettier.Pretty(q.QueryRaw, prettier.PlaceholderDollar, args...)
 	log.Println(
-		ctx,
 		fmt.Sprintf("sql: %s", q.Name),
 		fmt.Sprintf("query: %s", prettyQuery),
 	)

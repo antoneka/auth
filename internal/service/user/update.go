@@ -16,30 +16,46 @@ func (s *serv) Update(
 ) error {
 	const op = "service.user.Update"
 
-	currentUser, err := s.userStorage.Get(ctx, user.ID)
-	if err != nil {
-		return fmt.Errorf("%s: %w", op, err)
-	}
+	err := s.txManager.ReadCommitted(ctx, func(context.Context) error {
+		currentUser, errTx := s.userStorage.Get(ctx, user.ID)
+		if errTx != nil {
+			return errTx
+		}
 
-	if user.UserInfo.Name == "" {
-		user.UserInfo.Name = currentUser.UserInfo.Name
-	}
-	if user.UserInfo.Email == "" {
-		user.UserInfo.Email = currentUser.UserInfo.Email
-	}
-	if user.UserInfo.Password == "" {
-		user.UserInfo.Password = currentUser.UserInfo.Password
-	}
-	if user.UserInfo.Role == model.UNKNOWN {
-		user.UserInfo.Role = currentUser.UserInfo.Role
-	}
+		if user.UserInfo.Name == "" {
+			user.UserInfo.Name = currentUser.UserInfo.Name
+		}
+		if user.UserInfo.Email == "" {
+			user.UserInfo.Email = currentUser.UserInfo.Email
+		}
+		if user.UserInfo.Password == "" {
+			user.UserInfo.Password = currentUser.UserInfo.Password
+		}
+		if user.UserInfo.Role == model.UNKNOWN {
+			user.UserInfo.Role = currentUser.UserInfo.Role
+		}
 
-	user.UpdatedAt = sql.NullTime{
-		Time:  time.Now(),
-		Valid: true,
-	}
+		user.UpdatedAt = sql.NullTime{
+			Time:  time.Now(),
+			Valid: true,
+		}
 
-	err = s.userStorage.Update(ctx, user)
+		errTx = s.userStorage.Update(ctx, user)
+		if errTx != nil {
+			return errTx
+		}
+
+		errTx = s.logStorage.Log(ctx, &model.LogUser{
+			UserID: user.ID,
+			Action: model.LogActionUpdateUser,
+		})
+		if errTx != nil {
+			return errTx
+		}
+
+		return nil
+	})
+
 	if err != nil {
 		return fmt.Errorf("%s: %w", op, err)
 	}

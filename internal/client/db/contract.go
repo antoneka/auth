@@ -5,6 +5,7 @@ import (
 
 	"github.com/jackc/pgconn"
 	"github.com/jackc/pgx/v4"
+	"github.com/jackc/pgx/v4/pgxpool"
 )
 
 // Handler represents a function signature for handling transactions.
@@ -56,10 +57,16 @@ type Pinger interface {
 	Ping(ctx context.Context) error
 }
 
+// Pooler represents an interface for returning the connection pool.
+type Pooler interface {
+	Pool() *pgxpool.Pool
+}
+
 // DB represents a database connection.
 type DB interface {
 	SQLExecer
 	Transactor
 	Pinger
+	Pooler
 	Close()
 }
