@@ -6,12 +6,13 @@ import (
 
 	"golang.org/x/net/context"
 
-	"github.com/antoneka/auth/internal/client/db"
-	"github.com/antoneka/auth/internal/client/db/prettier"
 	"github.com/georgysavva/scany/pgxscan"
 	"github.com/jackc/pgconn"
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
+
+	"github.com/antoneka/auth/pkg/client/db"
+	"github.com/antoneka/auth/pkg/client/db/prettier"
 )
 
 // key is a custom type for context key.

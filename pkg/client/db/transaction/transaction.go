@@ -4,9 +4,10 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/antoneka/auth/internal/client/db"
-	"github.com/antoneka/auth/internal/client/db/pg"
 	"github.com/jackc/pgx/v4"
+
+	"github.com/antoneka/auth/pkg/client/db"
+	"github.com/antoneka/auth/pkg/client/db/pg"
 )
 
 // manager implements the TxManager interface.
@@ -60,7 +61,7 @@ func (m *manager) transaction(ctx context.Context, opts pgx.TxOptions, f db.Hand
 	}()
 
 	// Execute the transactional logic.
-	// If the handler returns an errors, rollback the transaction, otherwise commit the transaction.
+	// If the handler returns an error, rollback the transaction, otherwise commit the transaction.
 	if err = f(ctx); err != nil {
 		err = fmt.Errorf("failed to execute the code inside the transaction: %w", err)
 	}

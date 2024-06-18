@@ -1,8 +1,8 @@
 package log
 
 import (
-	"github.com/antoneka/auth/internal/client/db"
-	"github.com/antoneka/auth/internal/storage"
+	"github.com/antoneka/auth/internal/storage/postgres"
+	"github.com/antoneka/auth/pkg/client/db"
 )
 
 const (
@@ -18,7 +18,7 @@ type log struct {
 }
 
 // NewLogStorage creates a new instance of log storage.
-func NewLogStorage(db db.Client) storage.LogStorage {
+func NewLogStorage(db db.Client) postgres.LogStorage {
 	return &log{
 		db: db,
 	}

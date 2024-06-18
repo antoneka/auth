@@ -4,17 +4,17 @@ import (
 	"context"
 	"log"
 
-	"github.com/antoneka/auth/internal/api/user"
-	"github.com/antoneka/auth/internal/client/db"
-	"github.com/antoneka/auth/internal/client/db/pg"
-	"github.com/antoneka/auth/internal/client/db/transaction"
-	"github.com/antoneka/auth/internal/closer"
 	"github.com/antoneka/auth/internal/config"
+	"github.com/antoneka/auth/internal/handler/grpc/user"
 	"github.com/antoneka/auth/internal/service"
 	userServ "github.com/antoneka/auth/internal/service/user"
-	"github.com/antoneka/auth/internal/storage"
-	logStore "github.com/antoneka/auth/internal/storage/log"
-	userStore "github.com/antoneka/auth/internal/storage/user"
+	"github.com/antoneka/auth/internal/storage/postgres"
+	logStore "github.com/antoneka/auth/internal/storage/postgres/log"
+	userStore "github.com/antoneka/auth/internal/storage/postgres/user"
+	"github.com/antoneka/auth/pkg/client/db"
+	"github.com/antoneka/auth/pkg/client/db/pg"
+	"github.com/antoneka/auth/pkg/client/db/transaction"
+	"github.com/antoneka/auth/pkg/closer"
 )
 
 // serviceProvider is a DI container that manages service dependencies.
@@ -23,14 +23,15 @@ type serviceProvider struct {
 
 	dbClient    db.Client
 	txManager   db.TxManager
-	logStorage  storage.LogStorage
-	userStorage storage.UserStorage
+	logStorage  postgres.LogStorage
+	userStorage postgres.UserStorage
 
 	userService service.UserService
 
 	userAPI *user.Implementation
 }
 
+// newServiceProvider creates a new instance of serviceProvider.
 func newServiceProvider() *serviceProvider {
 	return &serviceProvider{}
 }
@@ -74,7 +75,7 @@ func (s *serviceProvider) TxManager(ctx context.Context) db.TxManager {
 	return s.txManager
 }
 
-func (s *serviceProvider) LogStorage(ctx context.Context) storage.LogStorage {
+func (s *serviceProvider) LogStorage(ctx context.Context) postgres.LogStorage {
 	if s.logStorage == nil {
 		s.logStorage = logStore.NewLogStorage(s.DBClient(ctx))
 	}
@@ -83,7 +84,7 @@ func (s *serviceProvider) LogStorage(ctx context.Context) storage.LogStorage {
 }
 
 // UserStorage returns the user storage instance.
-func (s *serviceProvider) UserStorage(ctx context.Context) storage.UserStorage {
+func (s *serviceProvider) UserStorage(ctx context.Context) postgres.UserStorage {
 	if s.userStorage == nil {
 		s.userStorage = userStore.NewStorage(s.DBClient(ctx))
 	}

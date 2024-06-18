@@ -10,7 +10,7 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/reflection"
 
-	"github.com/antoneka/auth/internal/closer"
+	"github.com/antoneka/auth/pkg/closer"
 	desc "github.com/antoneka/auth/pkg/user_v1"
 )
 

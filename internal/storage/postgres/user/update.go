@@ -5,8 +5,10 @@ import (
 	"fmt"
 
 	sq "github.com/Masterminds/squirrel"
-	"github.com/antoneka/auth/internal/client/db"
+
 	"github.com/antoneka/auth/internal/model"
+	"github.com/antoneka/auth/internal/storage/postgres/user/converter"
+	"github.com/antoneka/auth/pkg/client/db"
 )
 
 // Update updates a user record in the database with the provided user information.
@@ -16,13 +18,15 @@ func (r *store) Update(
 ) error {
 	const op = "storage.user.Update"
 
+	storeUser := converter.ServiceUserToStorage(user)
+
 	builder := sq.Update(tableUsers).
-		Set(nameColumn, user.UserInfo.Name).
-		Set(emailColumn, user.UserInfo.Email).
-		Set(passwordColumn, user.UserInfo.Password).
-		Set(roleColumn, user.UserInfo.Role).
-		Set(updatedColumn, user.UpdatedAt).
-		Where(sq.Eq{idColumn: user.ID}).
+		Set(nameColumn, storeUser.UserInfo.Name).
+		Set(emailColumn, storeUser.UserInfo.Email).
+		Set(passwordColumn, storeUser.UserInfo.Password).
+		Set(roleColumn, storeUser.UserInfo.Role).
+		Set(updatedColumn, storeUser.UpdatedAt).
+		Where(sq.Eq{idColumn: storeUser.ID}).
 		PlaceholderFormat(sq.Dollar)
 
 	query, args, err := builder.ToSql()

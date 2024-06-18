@@ -4,8 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/antoneka/auth/internal/client/db"
 	"github.com/jackc/pgx/v4/pgxpool"
+
+	"github.com/antoneka/auth/pkg/client/db"
 )
 
 // pgClient represents the implementation of the database client interface.

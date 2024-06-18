@@ -5,8 +5,10 @@ import (
 	"fmt"
 
 	sq "github.com/Masterminds/squirrel"
-	"github.com/antoneka/auth/internal/client/db"
+
 	"github.com/antoneka/auth/internal/model"
+	"github.com/antoneka/auth/internal/storage/postgres/user/converter"
+	"github.com/antoneka/auth/pkg/client/db"
 )
 
 // Create creates a new user record in the database.
@@ -16,9 +18,11 @@ func (r *store) Create(
 ) (int64, error) {
 	const op = "storage.user.Create"
 
+	storeUserInfo := converter.ServiceUserInfoToStorage(info)
+
 	builder := sq.Insert(tableUsers).
 		Columns(nameColumn, emailColumn, passwordColumn, roleColumn).
-		Values(info.Name, info.Email, info.Password, info.Role).
+		Values(storeUserInfo.Name, storeUserInfo.Email, storeUserInfo.Password, storeUserInfo.Role).
 		Suffix("RETURNING id").
 		PlaceholderFormat(sq.Dollar)
 
