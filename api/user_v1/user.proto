@@ -29,8 +29,7 @@ message CreateRequest {
   string name = 1; // Name of the user to create.
   string email = 2; // Email of the user to create.
   string password = 3; // Password of the user to create.
-  string password_confirm = 4; // Password confirmation of the user to create.
-  Role role = 5; // Role of the user to create.
+  Role role = 4; // Role of the user to create.
 }
 
 message CreateResponse {

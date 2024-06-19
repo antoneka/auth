@@ -20,7 +20,7 @@ func (s *Implementation) Delete(
 
 	err := s.userService.Delete(ctx, id)
 	if err != nil {
-		return &emptypb.Empty{}, fmt.Errorf("%s: %w", op, err)
+		return nil, fmt.Errorf("%s: %w", op, err)
 	}
 
 	return &emptypb.Empty{}, nil

@@ -19,7 +19,7 @@ func (s *Implementation) Get(
 
 	user, err := s.userService.Get(ctx, id)
 	if err != nil {
-		return &desc.GetResponse{}, fmt.Errorf("%s: %w", op, err)
+		return nil, fmt.Errorf("%s: %w", op, err)
 	}
 
 	return converter.ServiceToGetResponse(user), nil

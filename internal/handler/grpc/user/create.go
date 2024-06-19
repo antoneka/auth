@@ -19,7 +19,7 @@ func (s *Implementation) Create(
 
 	id, err := s.userService.Create(ctx, userInfo)
 	if err != nil {
-		return &desc.CreateResponse{}, fmt.Errorf("%s: %w", op, err)
+		return nil, fmt.Errorf("%s: %w", op, err)
 	}
 
 	return &desc.CreateResponse{
