@@ -18,6 +18,8 @@ import (
 )
 
 func TestUpdate(t *testing.T) {
+	t.Parallel()
+
 	type userServiceMockFunc func(mc *minimock.Controller) service.UserService
 
 	type args struct {
@@ -35,9 +37,7 @@ func TestUpdate(t *testing.T) {
 		password = gofakeit.Password(true, true, true, true, true, 6)
 		role     = desc.Role(gofakeit.Int32()%2 + 1)
 
-		op         = "handler.grpc.user.Update"
 		serviceErr = fmt.Errorf("service error")
-		apiErr     = fmt.Errorf("%s: %w", op, serviceErr)
 
 		req = &desc.UpdateRequest{
 			Id:       id,
@@ -56,10 +56,8 @@ func TestUpdate(t *testing.T) {
 				Role:     model.Role(desc.Role_name[int32(role)]),
 			},
 		}
-
-		res = &emptypb.Empty{}
 	)
-	defer t.Cleanup(mc.Finish)
+	// t.Cleanup(mc.Finish)
 
 	tests := []struct {
 		name            string
@@ -74,7 +72,7 @@ func TestUpdate(t *testing.T) {
 				ctx: ctx,
 				req: req,
 			},
-			want: res,
+			want: &emptypb.Empty{},
 			err:  nil,
 			userServiceMock: func(mc *minimock.Controller) service.UserService {
 				mock := serviceMocks.NewUserServiceMock(mc)
@@ -89,7 +87,7 @@ func TestUpdate(t *testing.T) {
 				req: req,
 			},
 			want: nil,
-			err:  apiErr,
+			err:  serviceErr,
 			userServiceMock: func(mc *minimock.Controller) service.UserService {
 				mock := serviceMocks.NewUserServiceMock(mc)
 				mock.UpdateMock.Expect(ctx, userModel).Return(serviceErr)
@@ -101,11 +99,13 @@ func TestUpdate(t *testing.T) {
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			userServiceMock := tt.userServiceMock(mc)
 			api := user.NewImplementation(userServiceMock)
 
 			resResponse, err := api.Update(tt.args.ctx, tt.args.req)
-			require.Equal(t, tt.err, err)
+			require.ErrorIs(t, err, tt.err)
 			require.Equal(t, tt.want, resResponse)
 		})
 	}

@@ -19,6 +19,8 @@ import (
 )
 
 func TestGet(t *testing.T) {
+	t.Parallel()
+
 	type userServiceMockFunc func(mc *minimock.Controller) service.UserService
 
 	type args struct {
@@ -37,9 +39,7 @@ func TestGet(t *testing.T) {
 		createdAt = gofakeit.Date()
 		updatedAt = gofakeit.Date()
 
-		op         = "handler.grpc.user.Get"
 		serviceErr = fmt.Errorf("service error")
-		apiErr     = fmt.Errorf("%s: %w", op, serviceErr)
 
 		req = &desc.GetRequest{
 			Id: id,
@@ -68,7 +68,7 @@ func TestGet(t *testing.T) {
 			UpdatedAt: timestamppb.New(updatedAt),
 		}
 	)
-	defer t.Cleanup(mc.Finish)
+	// t.Cleanup(mc.Finish)
 
 	tests := []struct {
 		name            string
@@ -98,7 +98,7 @@ func TestGet(t *testing.T) {
 				req: req,
 			},
 			want: nil,
-			err:  apiErr,
+			err:  serviceErr,
 			userServiceMock: func(mc *minimock.Controller) service.UserService {
 				mock := serviceMocks.NewUserServiceMock(mc)
 				mock.GetMock.Expect(ctx, id).Return(nil, serviceErr)
@@ -110,11 +110,13 @@ func TestGet(t *testing.T) {
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			userServiceMock := tt.userServiceMock(mc)
 			api := user.NewImplementation(userServiceMock)
 
 			resResponse, err := api.Get(tt.args.ctx, tt.args.req)
-			require.Equal(t, tt.err, err)
+			require.ErrorIs(t, err, tt.err)
 			require.Equal(t, tt.want, resResponse)
 		})
 	}

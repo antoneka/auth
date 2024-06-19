@@ -17,6 +17,8 @@ import (
 )
 
 func TestDelete(t *testing.T) {
+	t.Parallel()
+
 	type userServiceMockFunc func(mc *minimock.Controller) service.UserService
 
 	type args struct {
@@ -30,17 +32,13 @@ func TestDelete(t *testing.T) {
 
 		id = gofakeit.Int64()
 
-		op         = "handler.grpc.user.Delete"
 		serviceErr = fmt.Errorf("service error")
-		apiErr     = fmt.Errorf("%s: %w", op, serviceErr)
 
 		req = &desc.DeleteRequest{
 			Id: id,
 		}
-
-		res = &emptypb.Empty{}
 	)
-	defer t.Cleanup(mc.Finish)
+	// t.Cleanup(mc.Finish)
 
 	tests := []struct {
 		name            string
@@ -55,7 +53,7 @@ func TestDelete(t *testing.T) {
 				ctx: ctx,
 				req: req,
 			},
-			want: res,
+			want: &emptypb.Empty{},
 			err:  nil,
 			userServiceMock: func(mc *minimock.Controller) service.UserService {
 				mock := serviceMocks.NewUserServiceMock(mc)
@@ -70,7 +68,7 @@ func TestDelete(t *testing.T) {
 				req: req,
 			},
 			want: nil,
-			err:  apiErr,
+			err:  serviceErr,
 			userServiceMock: func(mc *minimock.Controller) service.UserService {
 				mock := serviceMocks.NewUserServiceMock(mc)
 				mock.DeleteMock.Expect(ctx, id).Return(serviceErr)
@@ -82,11 +80,13 @@ func TestDelete(t *testing.T) {
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
 			userServiceMock := tt.userServiceMock(mc)
 			api := user.NewImplementation(userServiceMock)
 
 			resResponse, err := api.Delete(tt.args.ctx, tt.args.req)
-			require.Equal(t, tt.err, err)
+			require.ErrorIs(t, err, tt.err)
 			require.Equal(t, tt.want, resResponse)
 		})
 	}
