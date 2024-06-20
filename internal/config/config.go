@@ -4,8 +4,9 @@ import (
 	"flag"
 	"log"
 
-	"github.com/antoneka/auth/internal/config/env"
 	"github.com/joho/godotenv"
+
+	"github.com/antoneka/auth/internal/config/env"
 )
 
 // Config represents the overall configuration for the app.

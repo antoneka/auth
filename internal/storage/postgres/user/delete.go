@@ -6,7 +6,7 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
-	"github.com/antoneka/auth/pkg/client/db"
+	"github.com/antoneka/platform-common/pkg/db"
 )
 
 // Delete deletes a user record from the database based on the provided ID.

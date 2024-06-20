@@ -13,14 +13,15 @@ import (
 	"github.com/jackc/pgx/v4"
 	"github.com/stretchr/testify/require"
 
+	"github.com/antoneka/platform-common/pkg/db"
+	transacMocks "github.com/antoneka/platform-common/pkg/db/mocks"
+	"github.com/antoneka/platform-common/pkg/db/pg"
+	"github.com/antoneka/platform-common/pkg/db/transaction"
+
 	"github.com/antoneka/auth/internal/model"
 	"github.com/antoneka/auth/internal/service/user"
 	"github.com/antoneka/auth/internal/storage/postgres"
 	storeMocks "github.com/antoneka/auth/internal/storage/postgres/mocks"
-	"github.com/antoneka/auth/pkg/client/db"
-	transacMocks "github.com/antoneka/auth/pkg/client/db/mocks"
-	"github.com/antoneka/auth/pkg/client/db/pg"
-	"github.com/antoneka/auth/pkg/client/db/transaction"
 )
 
 func TestUpdate(t *testing.T) {

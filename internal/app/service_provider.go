@@ -4,6 +4,11 @@ import (
 	"context"
 	"log"
 
+	"github.com/antoneka/platform-common/pkg/closer"
+	"github.com/antoneka/platform-common/pkg/db"
+	"github.com/antoneka/platform-common/pkg/db/pg"
+	"github.com/antoneka/platform-common/pkg/db/transaction"
+
 	"github.com/antoneka/auth/internal/config"
 	"github.com/antoneka/auth/internal/handler/grpc/user"
 	"github.com/antoneka/auth/internal/service"
@@ -11,10 +16,6 @@ import (
 	"github.com/antoneka/auth/internal/storage/postgres"
 	logStore "github.com/antoneka/auth/internal/storage/postgres/log"
 	userStore "github.com/antoneka/auth/internal/storage/postgres/user"
-	"github.com/antoneka/auth/pkg/client/db"
-	"github.com/antoneka/auth/pkg/client/db/pg"
-	"github.com/antoneka/auth/pkg/client/db/transaction"
-	"github.com/antoneka/auth/pkg/closer"
 )
 
 // serviceProvider is a DI container that manages service dependencies.

@@ -1,9 +1,10 @@
 package user
 
 import (
+	"github.com/antoneka/platform-common/pkg/db"
+
 	"github.com/antoneka/auth/internal/service"
 	"github.com/antoneka/auth/internal/storage/postgres"
-	"github.com/antoneka/auth/pkg/client/db"
 )
 
 var _ service.UserService = (*serv)(nil)

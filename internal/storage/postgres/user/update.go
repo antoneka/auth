@@ -6,9 +6,10 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 
+	"github.com/antoneka/platform-common/pkg/db"
+
 	"github.com/antoneka/auth/internal/model"
 	"github.com/antoneka/auth/internal/storage/postgres/user/converter"
-	"github.com/antoneka/auth/pkg/client/db"
 )
 
 // Update updates a user record in the database with the provided user information.

@@ -1,8 +1,9 @@
 package log
 
 import (
+	"github.com/antoneka/platform-common/pkg/db"
+
 	"github.com/antoneka/auth/internal/storage/postgres"
-	"github.com/antoneka/auth/pkg/client/db"
 )
 
 const (

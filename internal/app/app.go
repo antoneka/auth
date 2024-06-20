@@ -6,11 +6,11 @@ import (
 	"log"
 	"net"
 
+	"github.com/antoneka/platform-common/pkg/closer"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/reflection"
 
-	"github.com/antoneka/auth/pkg/closer"
 	desc "github.com/antoneka/auth/pkg/user_v1"
 )
 
