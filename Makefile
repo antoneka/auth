@@ -11,6 +11,7 @@ install-deps:
 	make install-goose
 	make install-minimock
 
+
 install-golangci-lint:
 	GOBIN=$(LOCAL_BIN) go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.56.2
 
@@ -54,3 +55,17 @@ local-migration-down:
 
 install-minimock:
 	GOBIN=$(LOCAL_BIN) go install github.com/gojuno/minimock/v3/cmd/minimock@v3.3.12
+
+
+test:
+	go clean -testcache
+	go test ./internal/handler/... ./internal/service/... -covermode count
+
+test-coverage:
+	go clean -testcache
+	go test ./internal/handler/... ./internal/service/... -coverprofile=coverage.tmp.out -covermode count
+	grep -v 'mocks\|config' coverage.tmp.out  > coverage.out
+	rm coverage.tmp.out
+	go tool cover -html=coverage.out;
+	go tool cover -func=./coverage.out | grep "total";
+	grep -sqFx "/coverage.out" .gitignore || echo "/coverage.out" >> .gitignore
