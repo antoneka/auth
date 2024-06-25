@@ -38,6 +38,7 @@ services:
     container_name: ${SERVER_CONTAINER_NAME}
     ports:
       - "${GRPC_PORT}:${GRPC_CONTAINER_PORT}"
+      - "${HTTP_PORT}:${HTTP_CONTAINER_PORT}"
     depends_on:
       pg:
         condition: service_healthy

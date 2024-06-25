@@ -12,6 +12,7 @@ import (
 // Config represents the overall configuration for the app.
 type Config struct {
 	GRPC *env.GRPCConfig
+	HTTP *env.HTTPConfig
 	PG   *env.PGConfig
 }
 
@@ -37,8 +38,14 @@ func MustLoad() *Config {
 		log.Panicf("failed to load PostgreSQL config: %v", err)
 	}
 
+	httpConfig, err := env.NewHTTPConfig()
+	if err != nil {
+		log.Panicf("failed to load HTTP config: %v", err)
+	}
+
 	return &Config{
 		GRPC: grpcConfig,
+		HTTP: httpConfig,
 		PG:   pgConfig,
 	}
 }

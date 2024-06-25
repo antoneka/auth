@@ -2,11 +2,16 @@ package app
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"net"
+	"net/http"
+	"time"
 
 	"github.com/antoneka/platform-common/pkg/closer"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"golang.org/x/sync/errgroup"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/reflection"
@@ -18,6 +23,7 @@ import (
 type App struct {
 	serviceProvider *serviceProvider
 	grpcServer      *grpc.Server
+	httpServer      *http.Server
 }
 
 // NewApp returns a new instance of the application.
@@ -39,7 +45,18 @@ func (a *App) Run() error {
 		closer.Wait()
 	}()
 
-	return a.runGRPCServer()
+	eg := new(errgroup.Group)
+
+	runActions := []func() error{
+		a.runGRPCServer,
+		a.runHTTPServer,
+	}
+
+	for _, runAction := range runActions {
+		eg.Go(runAction)
+	}
+
+	return eg.Wait()
 }
 
 // initDeps initializes the application dependencies.
@@ -47,6 +64,7 @@ func (a *App) initDeps(ctx context.Context) error {
 	inits := []func(ctx context.Context) error{
 		a.initServiceProvider,
 		a.initGRPCServer,
+		a.initHTTPServer,
 	}
 
 	for _, f := range inits {
@@ -77,6 +95,31 @@ func (a *App) initGRPCServer(ctx context.Context) error {
 	return nil
 }
 
+// initHTTPServer initializes the HTTP server.
+func (a *App) initHTTPServer(ctx context.Context) error {
+	mux := runtime.NewServeMux()
+
+	grpcAddress := fmt.Sprintf(":%s", a.serviceProvider.Config().GRPC.Port)
+	httpAddress := fmt.Sprintf(":%s", a.serviceProvider.Config().HTTP.Port)
+
+	opts := []grpc.DialOption{
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	}
+
+	err := desc.RegisterUserV1HandlerFromEndpoint(ctx, mux, grpcAddress, opts)
+	if err != nil {
+		return nil
+	}
+
+	a.httpServer = &http.Server{
+		Addr:              httpAddress,
+		Handler:           mux,
+		ReadHeaderTimeout: 2 * time.Second,
+	}
+
+	return nil
+}
+
 // runGRPCServer starts the gRPC server.
 func (a *App) runGRPCServer() error {
 	log.Printf("GRPC server is running on localhost:%s", a.serviceProvider.Config().GRPC.Port)
@@ -88,6 +131,18 @@ func (a *App) runGRPCServer() error {
 
 	err = a.grpcServer.Serve(list)
 	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// runHTTPServer starts the HTTP server.
+func (a *App) runHTTPServer() error {
+	log.Printf("HTTP server is running on localhost:%s", a.serviceProvider.Config().HTTP.Port)
+
+	err := a.httpServer.ListenAndServe()
+	if !errors.Is(err, http.ErrServerClosed) {
 		return err
 	}
 
