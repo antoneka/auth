@@ -9,12 +9,12 @@ const (
 	httpPortEnvName = "HTTP_CONTAINER_PORT"
 )
 
-// HTTPConfig represents the configuration for a gRPC server.
+// HTTPConfig represents the configuration for a HTTP server.
 type HTTPConfig struct {
 	Port string
 }
 
-// NewHTTPConfig creates a configuration for a gRPC server.
+// NewHTTPConfig creates a configuration for a HTTP server.
 func NewHTTPConfig() (*HTTPConfig, error) {
 	port := os.Getenv(httpPortEnvName)
 	if port == "" {

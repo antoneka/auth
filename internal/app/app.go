@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"log"
 	"net"
 	"net/http"
@@ -11,6 +12,8 @@ import (
 
 	"github.com/antoneka/platform-common/pkg/closer"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"github.com/rakyll/statik/fs"
+	"github.com/rs/cors"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -18,6 +21,9 @@ import (
 
 	"github.com/antoneka/auth/internal/interceptor"
 	desc "github.com/antoneka/auth/pkg/user_v1"
+
+	// The statik package is used to embed static swagger server files into the Go binary.
+	_ "github.com/antoneka/auth/statik"
 )
 
 // App represents the application instance.
@@ -25,6 +31,7 @@ type App struct {
 	serviceProvider *serviceProvider
 	grpcServer      *grpc.Server
 	httpServer      *http.Server
+	swaggerServer   *http.Server
 }
 
 // NewApp returns a new instance of the application.
@@ -51,6 +58,7 @@ func (a *App) Run() error {
 	runActions := []func() error{
 		a.runGRPCServer,
 		a.runHTTPServer,
+		a.runSwaggerServer,
 	}
 
 	for _, runAction := range runActions {
@@ -66,6 +74,7 @@ func (a *App) initDeps(ctx context.Context) error {
 		a.initServiceProvider,
 		a.initGRPCServer,
 		a.initHTTPServer,
+		a.initSwaggerServer,
 	}
 
 	for _, f := range inits {
@@ -115,8 +124,37 @@ func (a *App) initHTTPServer(ctx context.Context) error {
 		return nil
 	}
 
+	corsMiddleware := cors.New(cors.Options{
+		AllowedOrigins:   []string{"*"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Accept", "Content-Type", "Content-Length", "Authorization"},
+		AllowCredentials: true,
+	})
+
 	a.httpServer = &http.Server{
 		Addr:              httpAddress,
+		Handler:           corsMiddleware.Handler(mux),
+		ReadHeaderTimeout: 2 * time.Second,
+	}
+
+	return nil
+}
+
+// initSwaggerServer initialized the swagger server.
+func (a *App) initSwaggerServer(_ context.Context) error {
+	statikFs, err := fs.New()
+	if err != nil {
+		return err
+	}
+
+	mux := http.NewServeMux()
+	mux.Handle("/", http.StripPrefix("/", http.FileServer(statikFs)))
+	mux.HandleFunc("/user_api.swagger.json", serveSwaggerFile("/user_api.swagger.json"))
+
+	swaggerAddress := fmt.Sprintf(":%s", a.serviceProvider.Config().Swagger.Port)
+
+	a.swaggerServer = &http.Server{
+		Addr:              swaggerAddress,
 		Handler:           mux,
 		ReadHeaderTimeout: 2 * time.Second,
 	}
@@ -151,4 +189,62 @@ func (a *App) runHTTPServer() error {
 	}
 
 	return nil
+}
+
+// runSwaggerServer starts the swagger server.
+func (a *App) runSwaggerServer() error {
+	log.Printf("Swagger server is running on localhost:%s", a.serviceProvider.Config().Swagger.Port)
+
+	err := a.swaggerServer.ListenAndServe()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// serveSwaggerFile returns an HTTP handler function that serves a Swagger JSON file
+// located at the given path within the embedded filesystem.
+func serveSwaggerFile(path string) http.HandlerFunc {
+	return func(w http.ResponseWriter, _ *http.Request) {
+		log.Printf("Serving swagger file: %s", path)
+
+		statikFs, err := fs.New()
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		log.Printf("Open swagger file: %s", path)
+
+		file, err := statikFs.Open(path)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		err = file.Close()
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		log.Printf("Read swagger file: %s", path)
+
+		content, err := io.ReadAll(file)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		log.Printf("Write swagger file: %s", path)
+
+		w.Header().Set("Content-Type", "application/json")
+		_, err = w.Write(content)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		log.Printf("Served swagger file: %s", path)
+	}
 }

@@ -11,9 +11,10 @@ import (
 
 // Config represents the overall configuration for the app.
 type Config struct {
-	GRPC *env.GRPCConfig
-	HTTP *env.HTTPConfig
-	PG   *env.PGConfig
+	GRPC    *env.GRPCConfig
+	HTTP    *env.HTTPConfig
+	PG      *env.PGConfig
+	Swagger *env.SwaggerConfig
 }
 
 // MustLoad loads the configuration for the app from the .env file.
@@ -43,9 +44,15 @@ func MustLoad() *Config {
 		log.Panicf("failed to load HTTP config: %v", err)
 	}
 
+	swaggerConfig, err := env.NewSwaggerConfig()
+	if err != nil {
+		log.Panicf("failed to load swagger config: %v", err)
+	}
+
 	return &Config{
-		GRPC: grpcConfig,
-		HTTP: httpConfig,
-		PG:   pgConfig,
+		GRPC:    grpcConfig,
+		HTTP:    httpConfig,
+		PG:      pgConfig,
+		Swagger: swaggerConfig,
 	}
 }
