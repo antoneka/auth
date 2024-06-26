@@ -5,6 +5,7 @@ package user_v1;
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/empty.proto";
 import "google/api/annotations.proto";
+import "validate/validate.proto";
 
 option go_package = "github.com/antoneka/auth/pkg/user_v1;user_v1";
 
@@ -43,42 +44,62 @@ service UserV1 {
 
 enum Role {
   UNKNOWN_CHANGE_TYPE = 0;
-  USER = 1; // USER represents a regular user.
-  ADMIN = 2; // ADMIN represents an administrator.
+  // USER represents a regular user.
+  USER = 1;
+  // ADMIN represents an administrator.
+  ADMIN = 2;
 }
 
 message CreateRequest {
-  string name = 1; // Name of the user to create.
-  string email = 2; // Email of the user to create.
-  string password = 3; // Password of the user to create.
-  Role role = 4; // Role of the user to create.
+  // Name of the user to create.
+  string name = 1 [(validate.rules).string = {min_len: 1, max_len: 20}];
+  // Email of the user to create.
+  string email = 2 [(validate.rules).string.email = true];
+  // Password of the user to create.
+  string password = 3 [(validate.rules).string = {min_len: 1, max_len: 20}];
+  // Role of the user to create.
+  Role role = 4;
 }
 
 message CreateResponse {
-  int64 id = 1; // ID of the created user.
+  // ID of the created user.
+  int64 id = 1;
 }
 
 message GetRequest {
-  int64 id = 1; // ID of the user to get the information for.
+  // ID of the user to get the information for.
+  int64 id = 1 [(validate.rules).int64.gt = 0];
 }
 
 message GetResponse {
-  int64 id = 1; // User ID.
-  string name = 2; // Name of the user.
-  string email = 3; // Email of the user.
-  Role role = 4; // Role of the user.
-  google.protobuf.Timestamp created_at = 5; // Time when the user was created.
-  google.protobuf.Timestamp updated_at = 6; // Time when the user was last updated.
+  // User ID.
+  int64 id = 1;
+  // Name of the user.
+  string name = 2;
+  // Email of the user.
+  string email = 3;
+  // Role of the user.
+  Role role = 4;
+  // Time when the user was created.
+  google.protobuf.Timestamp created_at = 5;
+  // Time when the user was last updated.
+  google.protobuf.Timestamp updated_at = 6;
 }
 
 message UpdateRequest {
-  int64 id = 1; // ID of the user to update the information for.
-  optional string name = 2; // New name of the user.
-  optional string email = 3; // New email of the user.
-  optional string password = 4; // New password of the user.
-  optional Role role = 5; // New role of the user.
+  // ID of the user to update the information for.
+  int64 id = 1 [(validate.rules).int64.gt = 0];
+  // New name of the user.
+  optional string name = 2 [(validate.rules).string = {min_len: 1, max_len: 20}];
+  // New email of the user.
+  optional string email = 3 [(validate.rules).string.email = true];
+  // New password of the user.
+  optional string password = 4 [(validate.rules).string = {min_len: 1, max_len: 20}];
+  // New role of the user.
+  optional Role role = 5;
 }
 
 message DeleteRequest {
-  int64 id = 1; // ID of the user to be deleted from the system.
+  // ID of the user to be deleted from the system.
+  int64 id = 1 [(validate.rules).int64.gt = 0];
 }

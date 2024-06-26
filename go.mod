@@ -6,6 +6,7 @@ require (
 	github.com/Masterminds/squirrel v1.5.4
 	github.com/antoneka/platform-common v0.0.0-20240620125237-2ad98606a667
 	github.com/brianvoe/gofakeit v3.18.0+incompatible
+	github.com/envoyproxy/protoc-gen-validate v1.0.4
 	github.com/fatih/color v1.17.0
 	github.com/gojuno/minimock/v3 v3.3.12
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.20.0

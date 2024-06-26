@@ -16,6 +16,7 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/reflection"
 
+	"github.com/antoneka/auth/internal/interceptor"
 	desc "github.com/antoneka/auth/pkg/user_v1"
 )
 
@@ -86,7 +87,10 @@ func (a *App) initServiceProvider(_ context.Context) error {
 
 // initGRPCServer initializes the gRPC server.
 func (a *App) initGRPCServer(ctx context.Context) error {
-	a.grpcServer = grpc.NewServer(grpc.Creds(insecure.NewCredentials()))
+	a.grpcServer = grpc.NewServer(
+		grpc.Creds(insecure.NewCredentials()),
+		grpc.UnaryInterceptor(interceptor.ValidateInterceptor),
+	)
 
 	reflection.Register(a.grpcServer)
 
