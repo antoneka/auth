@@ -25,7 +25,6 @@ func (r *store) Update(
 		Set(nameColumn, storeUser.UserInfo.Name).
 		Set(emailColumn, storeUser.UserInfo.Email).
 		Set(passwordColumn, storeUser.UserInfo.Password).
-		Set(roleColumn, storeUser.UserInfo.Role).
 		Set(updatedColumn, storeUser.UpdatedAt).
 		Where(sq.Eq{idColumn: storeUser.ID}).
 		PlaceholderFormat(sq.Dollar)

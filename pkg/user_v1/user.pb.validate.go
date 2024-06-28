@@ -91,8 +91,6 @@ func (m *CreateRequest) validate(all bool) error {
 		errors = append(errors, err)
 	}
 
-	// no validation rules for Role
-
 	if len(errors) > 0 {
 		return CreateRequestMultiError(errors)
 	}
@@ -461,8 +459,6 @@ func (m *GetResponse) validate(all bool) error {
 
 	// no validation rules for Email
 
-	// no validation rules for Role
-
 	if all {
 		switch v := interface{}(m.GetCreatedAt()).(type) {
 		case interface{ ValidateAll() error }:
@@ -675,10 +671,6 @@ func (m *UpdateRequest) validate(all bool) error {
 			errors = append(errors, err)
 		}
 
-	}
-
-	if m.Role != nil {
-		// no validation rules for Role
 	}
 
 	if len(errors) > 0 {

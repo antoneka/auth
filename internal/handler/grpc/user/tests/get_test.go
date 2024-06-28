@@ -35,7 +35,6 @@ func TestGet(t *testing.T) {
 		id        = gofakeit.Int64()
 		name      = gofakeit.Name()
 		email     = gofakeit.Email()
-		role      = desc.Role(gofakeit.Int32()%2 + 1)
 		createdAt = gofakeit.Date()
 		updatedAt = gofakeit.Date()
 
@@ -50,7 +49,6 @@ func TestGet(t *testing.T) {
 			UserInfo: model.UserInfo{
 				Name:  name,
 				Email: email,
-				Role:  model.Role(desc.Role_name[int32(role)]),
 			},
 			CreatedAt: createdAt,
 			UpdatedAt: sql.NullTime{
@@ -63,7 +61,6 @@ func TestGet(t *testing.T) {
 			Id:        id,
 			Name:      name,
 			Email:     email,
-			Role:      role,
 			CreatedAt: timestamppb.New(createdAt),
 			UpdatedAt: timestamppb.New(updatedAt),
 		}

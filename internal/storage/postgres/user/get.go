@@ -20,7 +20,7 @@ func (r *store) Get(
 ) (*model.User, error) {
 	const op = "storage.user.Get"
 
-	builder := sq.Select(idColumn, nameColumn, emailColumn, passwordColumn, roleColumn, createdColumn, updatedColumn).
+	builder := sq.Select(idColumn, nameColumn, emailColumn, passwordColumn, createdColumn, updatedColumn).
 		From(tableUsers).
 		Where(sq.Eq{idColumn: id}).
 		Limit(1).

@@ -22,8 +22,8 @@ func (r *store) Create(
 	storeUserInfo := converter.ServiceUserInfoToStorage(info)
 
 	builder := sq.Insert(tableUsers).
-		Columns(nameColumn, emailColumn, passwordColumn, roleColumn).
-		Values(storeUserInfo.Name, storeUserInfo.Email, storeUserInfo.Password, storeUserInfo.Role).
+		Columns(nameColumn, emailColumn, passwordColumn).
+		Values(storeUserInfo.Name, storeUserInfo.Email, storeUserInfo.Password).
 		Suffix("RETURNING id").
 		PlaceholderFormat(sq.Dollar)
 

@@ -21,7 +21,6 @@ func StorageToServiceUserInfo(userInfo modelStore.UserInfo) model.UserInfo {
 		Name:     userInfo.Name,
 		Email:    userInfo.Email,
 		Password: userInfo.Password,
-		Role:     model.Role(userInfo.Role),
 	}
 }
 
@@ -41,6 +40,5 @@ func ServiceUserInfoToStorage(userInfo *model.UserInfo) modelStore.UserInfo {
 		Name:     userInfo.Name,
 		Email:    userInfo.Email,
 		Password: userInfo.Password,
-		Role:     string(userInfo.Role),
 	}
 }

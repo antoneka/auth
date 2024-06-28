@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"strconv"
 	"testing"
 	"time"
 
@@ -47,8 +46,6 @@ func TestUpdate(t *testing.T) {
 		newEmail    = gofakeit.Email()
 		oldPassword = gofakeit.Password(true, true, true, true, true, 6)
 		newPassword = gofakeit.Password(true, true, true, true, true, 6)
-		oldRole     = strconv.Itoa(int(gofakeit.Int32()%2 + 1))
-		newRole     = strconv.Itoa(int(gofakeit.Int32()%2 + 1))
 
 		currentUser = &model.User{
 			ID: id,
@@ -56,7 +53,6 @@ func TestUpdate(t *testing.T) {
 				Name:     oldName,
 				Email:    oldEmail,
 				Password: oldPassword,
-				Role:     model.Role(oldRole),
 			},
 		}
 
@@ -66,7 +62,6 @@ func TestUpdate(t *testing.T) {
 				Name:     newName,
 				Email:    newEmail,
 				Password: newPassword,
-				Role:     model.Role(newRole),
 			},
 		}
 

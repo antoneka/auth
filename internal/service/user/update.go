@@ -31,9 +31,6 @@ func (s *serv) Update(
 		if user.UserInfo.Password == "" {
 			user.UserInfo.Password = currentUser.UserInfo.Password
 		}
-		if user.UserInfo.Role == model.UNKNOWN {
-			user.UserInfo.Role = currentUser.UserInfo.Role
-		}
 
 		user.UpdatedAt = sql.NullTime{
 			Time:  time.Now(),

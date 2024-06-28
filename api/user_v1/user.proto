@@ -60,14 +60,6 @@ service UserV1 {
   }
 }
 
-enum Role {
-  UNKNOWN_CHANGE_TYPE = 0;
-  // USER represents a regular user.
-  USER = 1;
-  // ADMIN represents an administrator.
-  ADMIN = 2;
-}
-
 message CreateRequest {
   // Name of the user to create.
   string name = 1 [(validate.rules).string = {min_len: 1, max_len: 20}];
@@ -75,8 +67,6 @@ message CreateRequest {
   string email = 2 [(validate.rules).string.email = true];
   // Password of the user to create.
   string password = 3 [(validate.rules).string = {min_len: 1, max_len: 20}];
-  // Role of the user to create.
-  Role role = 4;
 }
 
 message CreateResponse {
@@ -96,8 +86,6 @@ message GetResponse {
   string name = 2;
   // Email of the user.
   string email = 3;
-  // Role of the user.
-  Role role = 4;
   // Time when the user was created.
   google.protobuf.Timestamp created_at = 5;
   // Time when the user was last updated.
@@ -113,8 +101,6 @@ message UpdateRequest {
   optional string email = 3 [(validate.rules).string.email = true];
   // New password of the user.
   optional string password = 4 [(validate.rules).string = {min_len: 1, max_len: 20}];
-  // New role of the user.
-  optional Role role = 5;
 }
 
 message DeleteRequest {

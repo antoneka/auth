@@ -3,7 +3,6 @@ package tests
 import (
 	"context"
 	"fmt"
-	"strconv"
 	"testing"
 
 	"github.com/brianvoe/gofakeit"
@@ -42,7 +41,6 @@ func TestCreate(t *testing.T) {
 		name     = gofakeit.Name()
 		email    = gofakeit.Email()
 		password = gofakeit.Password(true, true, true, true, true, 6)
-		role     = strconv.Itoa(int(gofakeit.Int32()%2 + 1))
 
 		storeErr = fmt.Errorf("storage error")
 
@@ -50,7 +48,6 @@ func TestCreate(t *testing.T) {
 			Name:     name,
 			Email:    email,
 			Password: password,
-			Role:     model.Role(role),
 		}
 	)
 	// t.Cleanup(mc.Finish)

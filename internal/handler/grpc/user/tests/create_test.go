@@ -34,7 +34,6 @@ func TestCreate(t *testing.T) {
 		name     = gofakeit.Name()
 		email    = gofakeit.Email()
 		password = gofakeit.Password(true, true, true, true, true, 6)
-		role     = desc.Role(gofakeit.Int32()%2 + 1)
 
 		serviceErr = fmt.Errorf("service error")
 
@@ -42,14 +41,12 @@ func TestCreate(t *testing.T) {
 			Name:     name,
 			Email:    email,
 			Password: password,
-			Role:     role,
 		}
 
 		userInfo = &model.UserInfo{
 			Name:     name,
 			Email:    email,
 			Password: password,
-			Role:     model.Role(desc.Role_name[int32(role)]),
 		}
 
 		res = &desc.CreateResponse{

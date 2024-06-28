@@ -197,10 +197,6 @@
         "password": {
           "type": "string",
           "description": "Password of the user to create."
-        },
-        "role": {
-          "$ref": "#/definitions/user_v1Role",
-          "description": "Role of the user to create."
         }
       }
     },
@@ -230,10 +226,6 @@
           "type": "string",
           "description": "Email of the user."
         },
-        "role": {
-          "$ref": "#/definitions/user_v1Role",
-          "description": "Role of the user."
-        },
         "createdAt": {
           "type": "string",
           "format": "date-time",
@@ -245,16 +237,6 @@
           "description": "Time when the user was last updated."
         }
       }
-    },
-    "user_v1Role": {
-      "type": "string",
-      "enum": [
-        "UNKNOWN_CHANGE_TYPE",
-        "USER",
-        "ADMIN"
-      ],
-      "default": "UNKNOWN_CHANGE_TYPE",
-      "description": " - USER: USER represents a regular user.\n - ADMIN: ADMIN represents an administrator."
     },
     "user_v1UpdateRequest": {
       "type": "object",
@@ -275,10 +257,6 @@
         "password": {
           "type": "string",
           "description": "New password of the user."
-        },
-        "role": {
-          "$ref": "#/definitions/user_v1Role",
-          "description": "New role of the user."
         }
       }
     }
