@@ -16,6 +16,7 @@ const (
 	redisIdleTimeoutEnvName       = "REDIS_IDLE_TIMEOUT_SEC"
 )
 
+// RedisConfig represents the configuration for a Redis connection.
 type RedisConfig struct {
 	Host string
 	Port string
@@ -26,6 +27,7 @@ type RedisConfig struct {
 	IdleTimeout time.Duration
 }
 
+// NewRedisConfig creates a new RedisConfig instance.
 func NewRedisConfig() (*RedisConfig, error) {
 	host := os.Getenv(redisHostEnvName)
 	if len(host) == 0 {
