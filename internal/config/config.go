@@ -15,7 +15,6 @@ type Config struct {
 	HTTP    *env.HTTPConfig
 	PG      *env.PGConfig
 	Swagger *env.SwaggerConfig
-	JWT     *env.JWTConfig
 	Redis   *env.RedisConfig
 }
 
