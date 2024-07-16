@@ -15,6 +15,7 @@ type Config struct {
 	HTTP    *env.HTTPConfig
 	PG      *env.PGConfig
 	Swagger *env.SwaggerConfig
+	Redis   *env.RedisConfig
 }
 
 // MustLoad loads the configuration for the app from the .env file.
@@ -46,7 +47,12 @@ func MustLoad() *Config {
 
 	swaggerConfig, err := env.NewSwaggerConfig()
 	if err != nil {
-		log.Panicf("failed to load swagger config: %v", err)
+		log.Panicf("failed to load Swagger config: %v", err)
+	}
+
+	redisConfig, err := env.NewRedisConfig()
+	if err != nil {
+		log.Panicf("failed to load Redis config: %v", err)
 	}
 
 	return &Config{
@@ -54,5 +60,6 @@ func MustLoad() *Config {
 		HTTP:    httpConfig,
 		PG:      pgConfig,
 		Swagger: swaggerConfig,
+		Redis:   redisConfig,
 	}
 }
